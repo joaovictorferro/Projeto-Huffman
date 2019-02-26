@@ -26,16 +26,9 @@ struct heap_adt{
 };
 
 void swap(huffmanTree * a, huffmanTree * b){ // Swap the nodes elements.
-  char caux; // auxiliar char.
-  int faux;  // auxiliar int.
-
-  caux = a->element;
-  a->element = b->element; // char element swap.
-  b->element = caux;
-
-  faux = a->freq;
-  a->freq = b->freq; // int freq swap.
-  b->freq = faux;
+  huffmanTree aux = *a;
+  *a = *b;
+  *b = aux;
 }
 
 heap * createHeap(){ // Creates a heap.
