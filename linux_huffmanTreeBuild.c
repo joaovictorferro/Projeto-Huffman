@@ -40,7 +40,7 @@ void swap(huffmanTree * a, huffmanTree * b){ // Swap the nodes elements.
 
 heap * createHeap(){ // Creates a heap.
 
-  heap * new = (heap*)malloc(sizeof(heap));
+  heap * new = (heap*) malloc(sizeof(heap));
   new->size = 0;
   return new;
 }
