@@ -3,15 +3,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <stdbool.h>
-#include <limits.h>
 
-#define MAX_HEAP_SIZE 257
 #define ASCII_SIZE 256
-#define DEBUG_HEAP 0
 
-typedef struct heap_adt heap;
+typedef struct priority_queue pqueue;
 typedef struct huffmanTree huffmanTree;
+typedef struct list_adt node;
 
 struct huffmanTree{
   int freq;
@@ -20,104 +17,57 @@ struct huffmanTree{
   huffmanTree * right;
 };
 
-struct heap_adt{
-  int size;
-  huffmanTree * data[MAX_HEAP_SIZE];
+struct list_adt{
+  huffmanTree * treeNode;
+  node * next;
 };
 
-void swap(huffmanTree * a, huffmanTree * b){ // Swap the nodes elements.
-  huffmanTree aux = *a;
-  *a = *b;
-  *b = aux;
-}
+struct priority_queue{
+  node * head;
+};
 
-heap * createHeap(){ // Creates a heap.
-
-  heap * new = (heap*) malloc(sizeof(heap));
-  new->size = 0;
+pqueue * createPriorityQueue(){
+  pqueue * new = (pqueue*)malloc(sizeof(pqueue));
+  new->head = NULL;
   return new;
 }
 
-int parentIndex(heap * h, int i){ // Calculates the parent node index.
-  return (i>>1);
-}
+void priorityEnqueue(pqueue * priorityQueue, huffmanTree * newTreeNode){
 
-int leftIndex(heap * h, int i){ // Calculates the left son index.
-  return (i<<1);
-}
+  node * new = (node*)malloc(sizeof(node));
+  new->treeNode = newTreeNode;
 
-int rightIndex(heap * h, int i){ // Calculates the right son index.
-  return ((i<<1)+1);
-}
-
-void enqHeapMin(heap * h, huffmanTree * new){ // Adds an element to the min heap.
-
-  if(h->size>=MAX_HEAP_SIZE){
-    printf("overflow\n");
-    return;
+  if(priorityQueue->head == NULL || new->treeNode->freq <= priorityQueue->head->treeNode->freq){
+    new->next = priorityQueue->head;
+    priorityQueue->head = new;
   }
   else{
-    h->data[++h->size] = new;
+    node * current = priorityQueue->head;
 
-    int keyIndex = h->size;
-    int parent = parentIndex(h,h->size);
-
-    while(parent >= 1 && h->data[keyIndex]->freq < h->data[parent]->freq){
-      swap(h->data[keyIndex],h->data[parent]);
-      keyIndex = parent;
-      parent = parentIndex(h,keyIndex);
+    while(current->next != NULL && current->next->treeNode->freq < new->treeNode->freq){
+      current = current->next;
     }
-  }
+
+    new->next = current->next;
+    current->next = new;
+  } 
 }
 
-void minHeapify(heap * h, int i){ // Maintains the min heap property.
-  int smallest;
-  int left = leftIndex(h,i);
-  int right = rightIndex(h,i);
+huffmanTree * priorityDequeue(pqueue * priorityQueue){
 
-  if(left <= h->size && h->data[left]->freq < h->data[i]->freq){
-    smallest = left;
-  }
-  else{
-    smallest = i;
-  }
-  if(right <= h->size && h->data[right]->freq < h->data[smallest]->freq){
-    smallest = right;
-  }
-
-  if(h->data[i]->freq != h->data[smallest]->freq){
-    swap(h->data[i],h->data[smallest]);
-    minHeapify(h,smallest);
-  }
-}
-
-huffmanTree * deqHeapMin(heap * h){ // Removes an element from the min heap.
-
-  if(!h->size){
-    printf("underflow\n");
+  if(priorityQueue->head == NULL){
+    printf("PRIORITY QUEUE UNDERFLOW!\n");
     return NULL;
   }
   else{
-    huffmanTree * item = h->data[1];
-    h->data[1] = h->data[h->size];
-    h->size --;
-    minHeapify(h,1);
-    return item;
+    node * auxiliar = priorityQueue->head;
+    priorityQueue->head = priorityQueue->head->next;
+    auxiliar->next = NULL;
+    return auxiliar->treeNode;
   }
 }
 
-void eraseHeap(heap * h){ // Deletes the haep.
-
-  int i;
-
-  for(i=0;i<=MAX_HEAP_SIZE;i++){
-    free(h->data[i]);
-  }
-
-  free(h);
-}
-
-huffmanTree * newNode(char c, int f){ // Creates a new huffman tree node to be added in the heap.
+huffmanTree * newNode(char c, int f){ // Creates a new huffman tree node to be added in the queue.
 
   huffmanTree * new = (huffmanTree*)malloc(sizeof(huffmanTree));
   new->element = c;
@@ -149,16 +99,18 @@ void getFileName(char name[]){
   name[l-1] = '\0';
 }
 
-huffmanTree * buildHuffmanTree(heap * h){
+huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
 
   huffmanTree * first_dequeued;
   huffmanTree * second_dequeued;
   int frequency;
 
-  while(h->size > 1){                     // while the size is bigger than 1 the function will keep getting the smallest frequency nodes,
-                                          // merge them into a new one, and then add again to the heap.
-    first_dequeued = deqHeapMin(h);
-    second_dequeued = deqHeapMin(h);
+  while(priorityQueue->head->next != NULL){                    
+
+    first_dequeued = priorityDequeue(priorityQueue);
+    second_dequeued = priorityDequeue(priorityQueue);
+
+    printf("%c %d %c %d\n", first_dequeued->element, first_dequeued->freq, second_dequeued->element, second_dequeued->freq);
 
     frequency = (first_dequeued->freq) + (second_dequeued->freq);
 
@@ -167,10 +119,10 @@ huffmanTree * buildHuffmanTree(heap * h){
     enqueued->left = first_dequeued;
     enqueued->right = second_dequeued;
 
-    enqHeapMin(h,enqueued);
+    priorityEnqueue(priorityQueue,enqueued);
   }
 
-  return h->data[1]; // the first and unique element from the heap will be the huffman root.
+  return priorityQueue->head->treeNode;
 }
 
 void printTree(huffmanTree * tree){
@@ -180,7 +132,7 @@ void printTree(huffmanTree * tree){
     return;
   }
 
-  printf(" ( %d %c %d", tree-> element, tree->element, tree->freq);
+  printf(" ( %c ", tree->element);
 
   printTree(tree->left);
   printTree(tree->right);
@@ -199,6 +151,17 @@ void eraseTree(huffmanTree * tree){
   free(tree);
 }
 
+void eraseList(node * head){
+
+  node * aux;
+
+  while(head!=NULL){
+    aux = head;
+    head = head->next;
+    free(aux); 
+  }
+}
+
 void main(){
 
   printf("Type the input file name:\n");
@@ -212,7 +175,9 @@ void main(){
 
   huffmanTree * huffmanRoot;
 
-  heap * h = createHeap(); 
+  pqueue * priorityQueue = createPriorityQueue();
+
+  node * pqueueHead;
 
   if(inputFile==NULL){
     printf("ERROR: there is no file with the name typed.\n");
@@ -226,21 +191,17 @@ void main(){
     for(i=0;i<ASCII_SIZE;i++){
       if(frequencyArray[i]){           // Adds a new node to the heap if the frequency of the char is >= 1.
         auxiliar = newNode(i,frequencyArray[i]);
-        enqHeapMin(h,auxiliar);
+        priorityEnqueue(priorityQueue,auxiliar);
       }
     }
 
-    if(DEBUG_HEAP){
-      for(i=1;i<=h->size;i++){
-        printf("%d %c %d\n", h->data[i]->element, h->data[i]->element, h->data[i]->freq); // Imprime os elementos da heap minima.
-      }
-    }
+    pqueueHead = priorityQueue->head;
 
-    huffmanRoot = buildHuffmanTree(h);
+    huffmanRoot = buildHuffmanTree(priorityQueue);
 
     printTree(huffmanRoot);
     printf("\n");
   }
   eraseTree(huffmanRoot);
-  free(h);
+  free(priorityQueue);
 }
