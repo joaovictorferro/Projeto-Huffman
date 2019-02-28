@@ -110,8 +110,6 @@ huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
     first_dequeued = priorityDequeue(priorityQueue);
     second_dequeued = priorityDequeue(priorityQueue);
 
-    printf("%c %d %c %d\n", first_dequeued->element, first_dequeued->freq, second_dequeued->element, second_dequeued->freq);
-
     frequency = (first_dequeued->freq) + (second_dequeued->freq);
 
     huffmanTree * enqueued = newNode('*',frequency);
