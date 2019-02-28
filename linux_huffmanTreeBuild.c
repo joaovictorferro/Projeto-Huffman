@@ -9,9 +9,19 @@
 typedef struct priority_queue pqueue;
 typedef struct huffmanTree huffmanTree;
 typedef struct list_adt node;
+typedef struct hash_table hasht;
+typedef struct hash_element hashe;
+
+struct hash_element{
+  char binary[2];
+};
+
+struct hash_table{
+  hashe * table[ASCII_SIZE];
+};
 
 struct huffmanTree{
-  int freq;
+  long int freq;
   char element;
   huffmanTree * left;
   huffmanTree * right;
@@ -25,6 +35,10 @@ struct list_adt{
 struct priority_queue{
   node * head;
 };
+
+int isLeaf(huffmanTree * treeNode){
+  return (!treeNode->left && !treeNode->right);
+}
 
 pqueue * createPriorityQueue(){
   pqueue * new = (pqueue*)malloc(sizeof(pqueue));
@@ -63,7 +77,9 @@ huffmanTree * priorityDequeue(pqueue * priorityQueue){
     node * auxiliar = priorityQueue->head;
     priorityQueue->head = priorityQueue->head->next;
     auxiliar->next = NULL;
-    return auxiliar->treeNode;
+    huffmanTree * returnNode = auxiliar->treeNode;
+    free(auxiliar);
+    return returnNode;
   }
 }
 
@@ -78,12 +94,13 @@ huffmanTree * newNode(char c, int f){ // Creates a new huffman tree node to be a
 
 }
 
-int * buildFrequency(FILE * input){ // Creates the frequency array.
+long int * buildFrequency(FILE * input){ // Creates the frequency array.
 
-  int * frequency = (int *)calloc(ASCII_SIZE,sizeof(int));
+  long int * frequency = (long int *)calloc(ASCII_SIZE,sizeof(long int));
   unsigned char currentByte;
+  FILE * auxiliar = input;
 
-  while(fscanf(input,"%c",&currentByte)!=EOF){
+  while(fscanf(auxiliar,"%c",&currentByte)!=EOF){
     frequency[currentByte]++;
   }
 
@@ -110,6 +127,8 @@ huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
     first_dequeued = priorityDequeue(priorityQueue);
     second_dequeued = priorityDequeue(priorityQueue);
 
+    //printf("%c %d %c %d\n", first_dequeued->element, first_dequeued->freq, second_dequeued->element, second_dequeued->freq);
+
     frequency = (first_dequeued->freq) + (second_dequeued->freq);
 
     huffmanTree * enqueued = newNode('*',frequency);
@@ -126,16 +145,16 @@ huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
 void printTree(huffmanTree * tree){
 
   if(tree==NULL){
-    printf(" () ");
+    //printf(" () ");
     return;
   }
 
-  printf(" ( %c ", tree->element);
-
+  //printf(" ( %c ", tree->element);
+  printf("%c", tree->element);
   printTree(tree->left);
   printTree(tree->right);
 
-  printf(") ");
+  //printf(") ");
 
 }
 
@@ -169,7 +188,7 @@ void main(){
 
   FILE * inputFile  = fopen(inputFileName,"rb"); // Opening the input file in binary read mode.
 
-  int * frequencyArray;
+  long int * frequencyArray;
 
   huffmanTree * huffmanRoot;
 
