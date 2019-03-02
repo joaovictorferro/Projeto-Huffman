@@ -9,20 +9,21 @@
 typedef struct priority_queue pqueue;
 typedef struct huffmanTree huffmanTree;
 typedef struct list_adt node;
-typedef struct hash_table hasht;
-typedef struct hash_element hashe;
+typedef struct hash_table hash;
+typedef struct hash_element helement;
 
 struct hash_element{
-  char binary[2];
+  unsigned char * binaryCode;
+  long int characterFrequency;
 };
 
 struct hash_table{
-  hashe * table[ASCII_SIZE];
+  helement * items[ASCII_SIZE];
 };
 
 struct huffmanTree{
   long int freq;
-  char element;
+  unsigned char element;
   huffmanTree * left;
   huffmanTree * right;
 };
@@ -36,8 +37,60 @@ struct priority_queue{
   node * head;
 };
 
+int max(int a, int b){
+  if(a>=b){
+    return a;
+  }
+  return b;
+}
+
+int height(huffmanTree * tree){
+  if(tree==NULL){
+    return -1;
+  }
+  return 1 + max(height(tree->left),height(tree->right));
+}
+
 int isLeaf(huffmanTree * treeNode){
   return (!treeNode->left && !treeNode->right);
+}
+
+hash * createHash(int maximumSize){
+  hash * new = (hash*)malloc(sizeof(hash));
+  int i;
+  for(i=0;i<ASCII_SIZE;i++){
+    new->items[i] = (helement*)malloc(sizeof(helement));
+    new->items[i]->binaryCode = (unsigned char *)calloc(maximumSize,sizeof(unsigned char)); 
+  }
+  return new;
+}
+
+void buildHash(hash * hashTable, huffmanTree * huffmanNode, int position, unsigned char * auxiliarString){
+
+  if(isLeaf(huffmanNode)){
+    auxiliarString[position] = '\0';
+    strncpy(hashTable->items[huffmanNode->element]->binaryCode,auxiliarString,position+1);
+    hashTable->items[huffmanNode->element]->characterFrequency = huffmanNode->freq;
+    return;
+  }
+  if(huffmanNode->left!=NULL){
+    auxiliarString[position] = '0';
+    buildHash(hashTable,huffmanNode->left,position+1,auxiliarString);
+  }
+  if(huffmanNode->right!=NULL){
+    auxiliarString[position] = '1';
+    buildHash(hashTable,huffmanNode->right,position+1,auxiliarString);
+  }
+
+}
+
+void eraseHash(hash * hashTable){
+  int i;
+  for(i=0;i<ASCII_SIZE;i++){
+    free(hashTable->items[i]->binaryCode);
+    free(hashTable->items[i]);
+  }
+  free(hashTable);
 }
 
 pqueue * createPriorityQueue(){
@@ -218,7 +271,22 @@ void main(){
 
     printTree(huffmanRoot);
     printf("\n");
+
+    int rootHeight = height(huffmanRoot);
+
+    hash * hashTable = createHash(rootHeight+1);
+
+    unsigned char auxiliarString[rootHeight+1];
+
+    buildHash(hashTable,huffmanRoot,0,auxiliarString);
+
+    for(i=0;i<ASCII_SIZE;i++){
+      if(hashTable->items[i]->characterFrequency){
+        printf("%c %s\n", i, hashTable->items[i]->binaryCode);
+      }
+    }
+    eraseHash(hashTable);
+    eraseTree(huffmanRoot);
+    free(priorityQueue);
   }
-  eraseTree(huffmanRoot);
-  free(priorityQueue);
 }
