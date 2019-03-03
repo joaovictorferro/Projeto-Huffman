@@ -14,12 +14,15 @@ typedef struct hash_element helement;
 
 // FUNÇÕES
 int max(int a, int b);
+
 hash *createHash(int maximumSize);
 void buildHash(hash *hashTable, huffmanTree *huffmanNode, int position, unsigned char *auxiliarString);
 void eraseHash(hash * hashTable);
+
 pqueue *createPriorityQueue();
 void priorityEnqueue(pqueue *priorityQueue, huffmanTree *newTreeNode);
 huffmanTree *priorityDequeue(pqueue *priorityQueue);
+
 int height(huffmanTree *tree);
 int isLeaf(huffmanTree *treeNode);
 huffmanTree *newNode(char c, int f);
@@ -27,6 +30,7 @@ long int *buildFrequency(FILE * input);
 huffmanTree *buildHuffmanTree(pqueue *priorityQueue);
 void printTree(huffmanTree *tree);
 void eraseTree(huffmanTree *tree);
+
 int max(int a, int b);
 void getFileName(char name[]);
 void eraseList(node * head);
