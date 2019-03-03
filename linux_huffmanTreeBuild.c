@@ -63,14 +63,20 @@ struct priority_queue{
 
 // ^ ------ DATATYPE ------ ^
 
+FILE *OpenFile(){
+  printf("Type the input file name:\n");
+  char name[200];
+  fgets(name,200,stdin);
+  int l = strlen(name);
+  name[l-1] = '\0';
+
+  FILE *inputFile = fopen(name, "rb");
+  return inputFile;
+}
+
 void main(){
 
-  printf("Type the input file name:\n");
-
-  char inputFileName[50];
-  getFileName(inputFileName); // Reading the input file name from the user.
-
-  FILE * inputFile  = fopen(inputFileName,"rb"); // Opening the input file in binary read mode.
+  FILE *inputFile = OpenFile();  
 
   long int * frequencyArray;
 
@@ -293,14 +299,6 @@ void eraseTree(huffmanTree *tree){
 
 int max(int a, int b){
   return a >= b ? a : b;
-}
-
-
-void getFileName(char name[]){
-
-  fgets(name,50,stdin);
-  int l = strlen(name);
-  name[l-1] = '\0';
 }
 
 void eraseList(node * head){
