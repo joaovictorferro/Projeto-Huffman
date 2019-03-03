@@ -24,8 +24,7 @@ struct hash_table{
 struct huffmanTree{
   long int freq;
   unsigned char element;
-  huffmanTree * left;
-  huffmanTree * right;
+  huffmanTree * left, *right;
 };
 
 struct list_adt{
@@ -38,29 +37,17 @@ struct priority_queue{
 };
 
 int max(int a, int b){
-  if(a>=b){
-    return a;
-  }
-  return b;
+  return a >= b ? a : b;
 }
 
-int height(huffmanTree * tree){
-  if(tree==NULL){
-    return -1;
-  }
-  return 1 + max(height(tree->left),height(tree->right));
-}
-
-int isLeaf(huffmanTree * treeNode){
-  return (!treeNode->left && !treeNode->right);
-}
+// v ------- HASH -------- v 
 
 hash * createHash(int maximumSize){
-  hash * new = (hash*)malloc(sizeof(hash));
+  hash * new = (hash *)malloc(sizeof(hash));
   int i;
-  for(i=0;i<ASCII_SIZE;i++){
-    new->items[i] = (helement*)malloc(sizeof(helement));
-    new->items[i]->binaryCode = (unsigned char *)calloc(maximumSize,sizeof(unsigned char)); 
+  for(i = 0; i < ASCII_SIZE; i++){
+    new->items[i] = (helement *) malloc(sizeof(helement));
+    new->items[i]->binaryCode = (unsigned char *) calloc(maximumSize,sizeof(unsigned char)); 
   }
   return new;
 }
@@ -92,6 +79,10 @@ void eraseHash(hash * hashTable){
   }
   free(hashTable);
 }
+
+// ^ ------- HASH ------- ^
+
+// v ------- P_QUEUE ------- v
 
 pqueue * createPriorityQueue(){
   pqueue * new = (pqueue*)malloc(sizeof(pqueue));
@@ -136,6 +127,19 @@ huffmanTree * priorityDequeue(pqueue * priorityQueue){
   }
 }
 
+// ^ ------- P_QUEUE ------- ^
+
+// v ------- TREE -------- v
+
+int height(huffmanTree * tree){
+  if(tree==NULL) return -1;
+  return 1 + max(height(tree->left),height(tree->right));
+}
+
+int isLeaf(huffmanTree * treeNode){
+  return (!treeNode->left && !treeNode->right);
+}
+
 huffmanTree * newNode(char c, int f){ // Creates a new huffman tree node to be added in the queue.
 
   huffmanTree * new = (huffmanTree*)malloc(sizeof(huffmanTree));
@@ -160,15 +164,6 @@ long int * buildFrequency(FILE * input){ // Creates the frequency array.
   return frequency;
 }
 
-void getFileName(char name[]){
-
-  fgets(name,50,stdin);
-
-  int l = strlen(name);
-
-  name[l-1] = '\0';
-}
-
 huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
 
   huffmanTree * first_dequeued;
@@ -179,8 +174,6 @@ huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
 
     first_dequeued = priorityDequeue(priorityQueue);
     second_dequeued = priorityDequeue(priorityQueue);
-
-    //printf("%c %d %c %d\n", first_dequeued->element, first_dequeued->freq, second_dequeued->element, second_dequeued->freq);
 
     frequency = (first_dequeued->freq) + (second_dequeued->freq);
 
@@ -197,18 +190,11 @@ huffmanTree * buildHuffmanTree(pqueue * priorityQueue){
 
 void printTree(huffmanTree * tree){
 
-  if(tree==NULL){
-    //printf(" () ");
-    return;
-  }
+  if(tree==NULL) return;
 
-  //printf(" ( %c ", tree->element);
   printf("%c", tree->element);
   printTree(tree->left);
   printTree(tree->right);
-
-  //printf(") ");
-
 }
 
 void eraseTree(huffmanTree * tree){
@@ -219,6 +205,15 @@ void eraseTree(huffmanTree * tree){
   eraseTree(tree->left);
   eraseTree(tree->right);
   free(tree);
+}
+
+// ^ ------- TREE -------- ^
+
+void getFileName(char name[]){
+
+  fgets(name,50,stdin);
+  int l = strlen(name);
+  name[l-1] = '\0';
 }
 
 void eraseList(node * head){
