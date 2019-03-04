@@ -63,21 +63,22 @@ struct priority_queue{
 
 // ^ ------ DATATYPE ------ ^
 
-void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long int *Seted_Bits){
+void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, *Seted_Bits){
   unsigned char character, bits;
 
   while( fscanf(FileToCompress, "%c", &character) != EOF ){
-    printf("%s", hashTable->items[character]->binaryCode);
+    printf("funcinaaaa\n");
   }
 
 }
 
 void StartCompress(hash *hashTable){
-  FILE *FileToCompress = OpenFile();
-  FILE *FileBits = fopen("File_With_Bits_Only.txt", "w");
+  // FILE *FileToCompress = OpenFile();
+  // FILE *FileBits = fopen("File_With_Bits_Only.txt", "w");
 
-  long int Seted_Bits = 0;
-  Compressing(FileToCompress, FileBits, hashTable, &Seted_Bits);
+  int Seted_Bits = 0;
+  // Compressing(FileToCompress, FileBits, hashTable, &Seted_Bits);
+  printf("funcina\n");
 
   fclose(FileToCompress);
   fclose(FileBits);
