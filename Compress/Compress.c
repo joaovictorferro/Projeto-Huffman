@@ -65,6 +65,7 @@ struct priority_queue{
 
 void StartCompress(){
   FILE *FileToCompress = OpenFile();
+  FILE *FileBits = fopen("File_With_Bits_Only.txt", "w");
 
   int Seted_Bits = 0;
 
