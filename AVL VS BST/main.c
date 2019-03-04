@@ -247,23 +247,32 @@ int main(){
 	scanf("%d", &max_size);
 	FILE *amostra;
 	amostra = fopen("amostra.txt", "w");
-	int i=0, j=0, k, media = 0, comp_abb = 0, cont = 0,comp_avl = 0,media1 = 0;
+	int i=0, j=0, k, media = 0, comp_abb = 0, cont = 0,comp_avl = 0,media1 = 0,array[max_size];
 	fprintf(amostra, "ABB AVL Size\n");
 	clock_t tempo;
   	tempo = clock();
 		binary_tree* root_abb = create_empty_binary_tree();
 		binary_tree* root_avl = create_empty_binary_tree();
-		for(j = 0; j < max_size; j++)
+		for(j = 0; j <= max_size; j++)
+		{
+				array[j] = j;
+		}	
+		for(j = 0; j <= max_size; j++)
+		{
+			k = rand() % max_size;
+			swap(&array[j], &array[k]);
+		}
+		for(j=0;j<=max_size;j++)
 		{
 			if(j == 0)
 			{
-				root_abb = add(root_abb,j);
+				root_abb = add(root_abb,array[j]);
 			}
 			else
 			{
-				root_abb = add(root_abb, j);
+				root_abb = add(root_abb, array[j]);
 			}
-			root_avl = insert_avl(root_avl,j);
+			root_avl = insert_avl(root_avl,array[j]);
 			if (avl (root_avl)) 
 			{
             	//printf("Continuou AVL...\n  ");
@@ -274,15 +283,15 @@ int main(){
                 root_avl = balance_binary_tree (root_avl);
         	}
         }
-			for(j = 0; j < 100; j++)
+			for(j = 0; j < max_size; j++)
 			{
-				k = rand() %j;
+				k = rand() % max_size;
 				search_abb(root_abb, k, &comp_abb);
 				search_avl(root_avl, k, &comp_avl);
 				media += comp_abb;
 				//printf("%d\n",media );
 				media1 += comp_avl;
-				comp_abb = 0;
+				//comp_abb = 0;
 				comp_avl = 0;
 				printf("%d %d %d\n", (int)media1, (int)media, j);
 				fprintf(amostra, "%d %d %d\n", (int)media1, (int)media, j);
