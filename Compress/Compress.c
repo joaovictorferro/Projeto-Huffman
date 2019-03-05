@@ -63,11 +63,39 @@ struct priority_queue{
 
 // ^ ------ DATATYPE ------ ^
 
-void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long int *Seted_Bits){
-  unsigned char character, bits;
+void SetBit(unsigned char *bits, unsigned char binary, int pos){
+  if(binary == '1'){
+    unsigned char mask = 1 << (8 - pos);
+    *bits = mask | *bits;
+  }
+  else if(binary == '0');
+  else printf("FATAL ERROR IN BINARY CODE HASH\n");
+}
+
+void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long int *Setted_Bits){
+  unsigned char character, bits = 0;
 
   while( fscanf(FileToCompress, "%c", &character) != EOF ){
-    printf("%s", hashTable->items[character]->binaryCode);
+
+    int i = 0;
+    while( hashTable->items[character]->binaryCode[i] != '\0' ){
+      (*Setted_Bits) ++;
+      SetBit(&bits, hashTable->items[character]->binaryCode[i], 
+             (*Setted_Bits) % 8 == 0 ? 8 : (*Setted_Bits) % 8 );
+
+      if( (*Setted_Bits) % 8 == 0 ){ //Byte is setted
+        fprintf(FileBits, "%c", bits);
+        bits = 0;
+      }
+
+      i++;
+    }
+
+  }
+
+  if( (*Setted_Bits) % 8 ){
+    fprintf(FileBits, "%c", bits);
+    bits = 0;
   }
 
 }
@@ -76,8 +104,8 @@ void StartCompress(hash *hashTable){
   FILE *FileToCompress = OpenFile();
   FILE *FileBits = fopen("File_With_Bits_Only.txt", "w");
 
-  long int Seted_Bits = 0;
-  Compressing(FileToCompress, FileBits, hashTable, &Seted_Bits);
+  long int Setted_Bits = 0;
+  Compressing(FileToCompress, FileBits, hashTable, &Setted_Bits);
 
   fclose(FileToCompress);
   fclose(FileBits);
@@ -134,6 +162,8 @@ void main(){
     fclose(inputFile);
     StartCompress(hashTable);
   }
+
+  printf("ok\n");
 }
 
 // v ------- HASH -------- v 
