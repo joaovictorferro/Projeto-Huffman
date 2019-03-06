@@ -97,6 +97,8 @@ void main(){
 
     huffmanRoot = buildHuffmanTree(priorityQueue);
 
+    free(priorityQueue);
+
     printTree(huffmanRoot);
     printf("\n");
 
@@ -118,9 +120,10 @@ void main(){
     // eraseTree(huffmanRoot);
     // free(priorityQueue);
     StartCompress(hashTable, huffmanRoot, inputFile);
+    eraseHash(hashTable);
+    eraseTree(huffmanRoot);
+    printf("ok\n");
   }
-
-  printf("ok\n");
 }
 
 // v ------- HASH -------- v 
@@ -328,6 +331,7 @@ void printTreeInFile(huffmanTree *tree, int *treeSize, FILE *FileBits){
     if(tree->element == '*' || tree->element == '\\'){
       unsigned char aux = '\\';
       fprintf(FileBits, "%c", aux);
+      (*treeSize)++;
     }
     fprintf(FileBits, "%c", tree->element);
     return;
