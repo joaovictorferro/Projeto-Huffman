@@ -72,7 +72,7 @@ struct priority_queue{
 // ^ ------ DATATYPE ------ ^
 
 unsigned char SetBit(unsigned char currentByte, short int size){
- return (currentByte|(1 << (7-size)));
+ return (currentByte | (1 << (7-size)));
 }
 
 void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long int *Setted_Bits){
