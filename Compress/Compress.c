@@ -63,16 +63,23 @@ struct priority_queue{
 
 // ^ ------ DATATYPE ------ ^
 
+void printTreeInFile(huffmanTree *tree, int *treeSize, FILE *FileBits){
+
+  if(tree == NULL) return;
+  (*treeSize) ++;
+  fprintf(FileBits,"%c", tree->element);
+  printTree(tree->left);
+  printTree(tree->right);
+}
+
 void SetBit(unsigned char *bits, unsigned char binary, int pos){
   if(binary == '1'){
     unsigned char mask = 1 << (8 - pos);
     *bits = mask | *bits;
   }
-  else if(binary == '0');
-  else printf("FATAL ERROR IN BINARY CODE HASH\n");
 }
 
-void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long int *Setted_Bits){
+void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long long int *Setted_Bits){
   unsigned char character, bits = 0;
 
   while( fscanf(FileToCompress, "%c", &character) != EOF ){
@@ -100,13 +107,19 @@ void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long int
 
 }
 
-void StartCompress(hash *hashTable){
-  FILE *FileToCompress = OpenFile();
-  FILE *FileBits = fopen("File_With_Bits_Only.txt", "w");
+void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress){
+  rewind(FileToCompress);
+  FILE *FileBits = fopen("File_With_Bits_Only.txt", "wb");
+  fseek(FileBits, 2*sizeof(unsigned char), SEEK_SET);
 
-  long int Setted_Bits = 0;
+  int treeSize = 0;
+  printTreeInFile(root, &treeSize, FileBits);
+
+  long long int Setted_Bits = 0;
   Compressing(FileToCompress, FileBits, hashTable, &Setted_Bits);
+  rewind(FileBits);
 
+  printf("%d\n", treeSize);
   fclose(FileToCompress);
   fclose(FileBits);
 }
@@ -159,8 +172,7 @@ void main(){
     // eraseHash(hashTable);
     // eraseTree(huffmanRoot);
     // free(priorityQueue);
-    fclose(inputFile);
-    StartCompress(hashTable);
+    StartCompress(hashTable, huffmanRoot, inputFile);
   }
 
   printf("ok\n");
