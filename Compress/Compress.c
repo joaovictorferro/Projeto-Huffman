@@ -128,10 +128,25 @@ void printTrashAndTreeSize(int treeSize, long long int Setted_Bits, FILE *FileBi
       first = mask | first;
     }
     trash /= 2;
-
-    //// CONTINUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
   }
 
+  for(pos = 0; pos < 8; pos++){
+    if( treeSize % 2 ){
+      unsigned char mask = 1 << pos;
+      second = mask | second;
+    } 
+    treeSize /= 2;
+  }
+
+  for(pos = 0; pos < 5; pos ++){
+    if( treeSize % 2 ){
+      unsigned char mask = 1 << pos;
+      first = mask | first;
+    }
+    treeSize /= 2;
+  }
+
+  fprintf(FileBits, "%c%c", first, second);
 }
 
 void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress){
