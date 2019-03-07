@@ -11,7 +11,6 @@ struct node_tree
 	node_t *right;
 };
 
-
 /* cria os nos da arvore*/
 node_t *create_node(unsigned int character, node_t *left, node_t *right); 
 
