@@ -149,7 +149,7 @@ int main()
 		return 0; 
 	}
 	unsigned int trash_size = get_trash_size(input_file);
-
+	printf ("trash e %d\n",trash_size);
 	unsigned int tree_size = get_tree_size(input_file);
 
 	node_t *huff_tree = get_tree(input_file, tree_size);
