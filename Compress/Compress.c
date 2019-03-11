@@ -25,7 +25,7 @@ huffmanTree *priorityDequeue(pqueue *priorityQueue);
 
 int height(huffmanTree *tree);
 int isLeaf(huffmanTree *treeNode);
-huffmanTree *newNode(char c, int f);
+huffmanTree *newNode(unsigned char c, long int f);
 long int *buildFrequency(FILE * input);
 huffmanTree *buildHuffmanTree(pqueue *priorityQueue);
 void printTree(huffmanTree *tree);
@@ -77,59 +77,61 @@ void main(){
   pqueue * priorityQueue = createPriorityQueue();
   node * pqueueHead;
 
-  if(inputFile==NULL){
-    printf("ERROR: there is no file with the name typed.\n");
-  }
-  else{
-    printf("File found.\n");
-    frequencyArray = buildFrequency(inputFile);
-    int i;
-    huffmanTree * auxiliar;
-
-    for(i=0;i<ASCII_SIZE;i++){
-      if(frequencyArray[i]){           // Adds a new node to the heap if the frequency of the char is >= 1.
-        auxiliar = newNode(i,frequencyArray[i]);
-        priorityEnqueue(priorityQueue,auxiliar);
-      }
+while(1){
+    if(inputFile==NULL){
+      printf("ERROR: there is no file with the name typed. Type again the file's name.\n");
+      inputFile = OpenFile();
     }
+    else{
+      printf("File found.\n");
+      frequencyArray = buildFrequency(inputFile);
+      int i;
+      huffmanTree * auxiliar;
 
-    pqueueHead = priorityQueue->head;
-
-    huffmanRoot = buildHuffmanTree(priorityQueue);
-
-    free(priorityQueue);
-
-    printTree(huffmanRoot);
-    printf("\n");
-
-    int rootHeight = height(huffmanRoot);
-
-    hash * hashTable = createHash(rootHeight+1);
-
-    unsigned char auxiliarString[rootHeight+1];
-
-    buildHash(hashTable,huffmanRoot,0,auxiliarString);
-
-    for(i=0;i<ASCII_SIZE;i++){
-      if(hashTable->items[i]->characterFrequency){
-        printf("%c %s\n", i, hashTable->items[i]->binaryCode);
+      for(i = 0; i < ASCII_SIZE; i++){
+        if(frequencyArray[i]){           // Adds a new node to the heap if the frequency of the char is >= 1.
+          auxiliar = newNode( i, frequencyArray[i]);
+          priorityEnqueue(priorityQueue,auxiliar);
+        }
       }
-    }
 
-    // eraseHash(hashTable);
-    // eraseTree(huffmanRoot);
-    // free(priorityQueue);
-    StartCompress(hashTable, huffmanRoot, inputFile);
-    eraseHash(hashTable);
-    eraseTree(huffmanRoot);
-    printf("ok\n");
+      pqueueHead = priorityQueue->head;
+
+      huffmanRoot = buildHuffmanTree(priorityQueue);
+
+      free(priorityQueue);
+
+      printTree(huffmanRoot);
+      printf("\n");
+
+      int rootHeight = height(huffmanRoot);
+
+      hash * hashTable = createHash(rootHeight+1);
+
+      unsigned char auxiliarString[rootHeight+1];
+
+      buildHash(hashTable,huffmanRoot,0,auxiliarString);
+
+      for(i=0;i<ASCII_SIZE;i++){
+        if(hashTable->items[i]->characterFrequency){
+          printf("%c %s\n", i, hashTable->items[i]->binaryCode);
+        }
+      }
+
+      StartCompress(hashTable, huffmanRoot, inputFile);
+      eraseHash(hashTable);
+      eraseTree(huffmanRoot);
+
+      printf("ok\n");
+      return;
+    }
   }
 }
 
 // v ------- HASH -------- v 
 
 hash *createHash(int maximumSize){
-  hash * new = (hash *)malloc(sizeof(hash));
+  hash * new = (hash *) malloc(sizeof(hash));
   int i;
   for(i = 0; i < ASCII_SIZE; i++){
     new->items[i] = (helement *) malloc(sizeof(helement));
@@ -172,14 +174,14 @@ void eraseHash(hash * hashTable){
 // v ------- P_QUEUE ------- v
 
 pqueue *createPriorityQueue(){
-  pqueue * new = (pqueue*)malloc(sizeof(pqueue));
+  pqueue * new = (pqueue*) malloc(sizeof(pqueue));
   new->head = NULL;
   return new;
 }
 
 void priorityEnqueue(pqueue *priorityQueue, huffmanTree *newTreeNode){
 
-  node * new = (node*)malloc(sizeof(node));
+  node * new = (node*) malloc(sizeof(node));
   new->treeNode = newTreeNode;
 
   if(priorityQueue->head == NULL || new->treeNode->freq <= priorityQueue->head->treeNode->freq){
@@ -219,17 +221,17 @@ huffmanTree *priorityDequeue(pqueue *priorityQueue){
 // v ------- TREE -------- v
 
 int height(huffmanTree *tree){
-  if(tree==NULL) return -1;
-  return 1 + max(height(tree->left),height(tree->right));
+  if(tree == NULL) return -1;
+  return 1 + max( height(tree->left), height(tree->right));
 }
 
 int isLeaf(huffmanTree *treeNode){
   return (!treeNode->left && !treeNode->right);
 }
 
-huffmanTree *newNode(char c, int f){ // Creates a new huffman tree node to be added in the queue.
+huffmanTree *newNode(unsigned char c, long int f){ // Creates a new huffman tree node to be added in the queue.
 
-  huffmanTree * new = (huffmanTree*)malloc(sizeof(huffmanTree));
+  huffmanTree * new = (huffmanTree*) malloc(sizeof(huffmanTree));
   new->element = c;
   new->freq = f;
   new->left = NULL;
@@ -240,12 +242,12 @@ huffmanTree *newNode(char c, int f){ // Creates a new huffman tree node to be ad
 
 long int *buildFrequency(FILE * input){ // Creates the frequency array.
 
-  long int * frequency = (long int *)calloc(ASCII_SIZE,sizeof(long int));
+  long int * frequency = (long int *) calloc(ASCII_SIZE, sizeof(long int));
   unsigned char currentByte;
   FILE * auxiliar = input;
 
-  while(fscanf(auxiliar,"%c",&currentByte)!=EOF){
-    frequency[currentByte]++;
+  while(fscanf(auxiliar,"%c",&currentByte) != EOF){
+    frequency[currentByte] ++;
   }
 
   return frequency;
@@ -325,6 +327,7 @@ FILE *OpenFile(){
 void printTreeInFile(huffmanTree *tree, int *treeSize, FILE *FileBits){
 
   if(tree == NULL) return;
+
   (*treeSize) ++;
 
   if( isLeaf(tree) ){
@@ -333,6 +336,7 @@ void printTreeInFile(huffmanTree *tree, int *treeSize, FILE *FileBits){
       fprintf(FileBits, "%c", aux);
       (*treeSize)++;
     }
+
     fprintf(FileBits, "%c", tree->element);
     return;
   }
@@ -357,6 +361,7 @@ void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long lon
 
     int i = 0;
     while( hashTable->items[character]->binaryCode[i] != '\0' ){
+
       (*Setted_Bits) ++;
       SetBit(&bits, hashTable->items[character]->binaryCode[i], 
              (*Setted_Bits) % 8 == 0 ? 8 : (*Setted_Bits) % 8 );
@@ -382,6 +387,8 @@ void printTrashAndTreeSize(int treeSize, long long int Setted_Bits, FILE *FileBi
   unsigned char first = 0, second = 0;
   int pos, trash = 8 - (Setted_Bits % 8);
 
+  if (trash == 8) trash = 0;
+  
   for(pos = 0; pos < 3; pos++){
     if( trash % 2 ){
       unsigned char mask = 1 << (pos + 5);
@@ -411,7 +418,7 @@ void printTrashAndTreeSize(int treeSize, long long int Setted_Bits, FILE *FileBi
 
 void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress){
   rewind(FileToCompress);
-  FILE *FileBits = fopen("File_With_Bits_Only.txt", "wb");
+  FILE *FileBits = fopen("File_With_Bits_Only.huff", "wb");
   fseek(FileBits, 2*sizeof(unsigned char), SEEK_SET);
 
   int treeSize = 0;
