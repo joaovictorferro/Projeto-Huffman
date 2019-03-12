@@ -75,7 +75,7 @@ void decompress(FILE *input_file, unsigned int trash_size, int tree_size, node_t
 		current_byte = getc(input_file);
 	}
 
-	for (i = 7; i >= (signed int)trash_size; i--) 
+	for (i = 7; i >= (unsigned int)trash_size; i--) 
 	{
 		if (is_bit_set(current_byte, i) != 0) 
 		{
@@ -124,17 +124,26 @@ unsigned int get_tree_size(FILE *input_file)
 
 	first_byte = (first_byte << 3);
 	first_byte = (first_byte >> 3);
-	tree_size = ((first_byte << 8) | second_byte);
+	tree_size = ((first_byte << 8) | second_byte); //ERRADO!!1 MUDAR
+	// FIRST BYTE ESTA SENDO ZERADO
 
 	return (tree_size);
 }
 
+FILE *OpenFile(){
+    printf("Type the input file name:\n");
+    char name[100];
+    fgets(name,100,stdin);
+    int l = strlen(name);
+    name[l-1] = '\0';
+
+    return fopen(name, "rb");
+}
+
 int main()
 {
-	FILE *input_file;
+	FILE *input_file = OpenFile();
 	FILE *output_file; 
-
-	input_file = fopen("teste.txt","rb");
 	
 	if (input_file == NULL) 
 	{
@@ -142,7 +151,7 @@ int main()
 		return 0;
 	}
 
-	output_file = fopen("saida.txt","wb+");	
+	output_file = fopen("CompressedFile.txt","wb+");	
 	if (output_file == NULL) 
 	{
 		printf("não foi possível escrever no arquivo");

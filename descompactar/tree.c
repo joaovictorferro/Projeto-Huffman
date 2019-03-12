@@ -28,9 +28,9 @@ node_t *build_tree(unsigned int **tree_array)
 	if (**tree_array == '*') 
 	{
 		node_t *left;
-		*tree_array = (*tree_array + 1); 
+		(*tree_array) ++; 
 		left = build_tree(tree_array);
-		*tree_array = (*tree_array + 1); 
+		(*tree_array) ++; 
 		return (create_node('*', left, build_tree(tree_array)));
 
 	}
@@ -53,9 +53,9 @@ node_t *get_tree(FILE *input_file, unsigned int tree_size)
 	tree_array = get_tree_array(input_file, tree_size);
 
 	unsigned int *tree_array_zero;
-	tree_array_zero = tree_array;
+	tree_array_auxiliar = tree_array;
 	node_t *tree_root = build_tree(&tree_array);	
-	free(tree_array_zero);
+	free(tree_array_auxiliar);
 
 	return (tree_root);
 }
