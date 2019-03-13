@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 typedef struct binary_t binary_tree;
 struct binary_t
@@ -10,6 +9,7 @@ struct binary_t
 	struct binary_t *right;
 };
 
+//-------------------------------------AVL--------------------------------------------------------//
 binary_tree *create_binary_tree_avl(int value) 
 {
     binary_tree *new_binary_tree = (binary_tree*) malloc(sizeof(binary_tree));
@@ -185,6 +185,7 @@ void free_avl(binary_tree *avl)
     }
 }
 
+//--------------------------------------ABB-------------------------------------------------------//
 int is_empty(binary_tree *bt)
 {
 	return(bt == NULL);
@@ -234,6 +235,8 @@ binary_tree* search_abb(binary_tree *bt, int item, int *comparisons)
 	}
 }
 
+//-----------------------------------------------------------------------------------------------//
+
 void swap(int *a, int *b) 
 {
     int aux = *a;
@@ -245,61 +248,60 @@ int main(){
 	int max_size, each;
 	printf("Tamanho maximo:");
 	scanf("%d", &max_size);
-	FILE *amostra;
+	
+    FILE *amostra;
 	amostra = fopen("amostra.txt", "w");
-	int i=0, j=0, k, media = 0, comp_abb = 0, cont = 0,comp_avl = 0,media1 = 0,array[max_size];
-	fprintf(amostra, "ABB AVL Size\n");
-	clock_t tempo;
-  	tempo = clock();
-		binary_tree* root_abb = create_empty_binary_tree();
-		binary_tree* root_avl = create_empty_binary_tree();
-		for(j = 0; j <= max_size; j++)
+	
+    int i=0, j=0, k, media = 0, comp_abb = 0, cont = 0,comp_avl = 0,array[max_size];
+	fprintf(amostra, "ABB AVL Valor\n");
+		
+    binary_tree* root_abb = create_empty_binary_tree();
+	binary_tree* root_avl = create_empty_binary_tree();
+		
+    for (j = 0; j <= max_size; j++)
+	{
+		array[j] = j;
+	}	
+	
+    for(j=0;j<=max_size;j++)
+	{
+		if(j == 0)
 		{
-				array[j] = j;
-		}	
-		for(j = 0; j <= max_size; j++)
-		{
-			k = rand() % max_size;
-			swap(&array[j], &array[k]);
+			root_abb = add(root_abb,array[j]);
 		}
-		for(j=0;j<=max_size;j++)
+		else
 		{
-			if(j == 0)
-			{
-				root_abb = add(root_abb,array[j]);
-			}
-			else
-			{
-				root_abb = add(root_abb, array[j]);
-			}
+			root_abb = add(root_abb, array[j]);
+		}
 			root_avl = insert_avl(root_avl,array[j]);
-			if (avl (root_avl)) 
-			{
-            	//printf("Continuou AVL...\n  ");
-        	} 
-        	else 
-        	{
-                //printf("ajustar balanceamento...\n  ");
-                root_avl = balance_binary_tree (root_avl);
-        	}
+		
+        if (avl (root_avl)) 
+		{
+            //printf("Continuou AVL...\n  ");
+        } 
+        else 
+        {
+            //printf("ajustar balanceamento...\n  ");
+            root_avl = balance_binary_tree (root_avl);
         }
-			for(j = 0; j < max_size; j++)
-			{
-				k = rand() % max_size;
-				search_abb(root_abb, k, &comp_abb);
-				search_avl(root_avl, k, &comp_avl);
-				media += comp_abb;
-				//printf("%d\n",media );
-				media1 += comp_avl;
-				//comp_abb = 0;
-				comp_avl = 0;
-				printf("%d %d %d\n", (int)media1, (int)media, j);
-				fprintf(amostra, "%d %d %d\n", (int)media1, (int)media, j);
-				media = media1 = 0;
-			}
-			free_bt(root_abb);
-			free_avl(root_avl);
-	printf("Tempo:%f\n",(clock() - tempo) / (double)CLOCKS_PER_SEC);
-	fclose(amostra);
+    }
+			
+    for(j = 0; j < max_size; j++)
+	{
+		k = rand() % max_size;
+		search_abb(root_abb, k, &comp_abb);
+		search_avl(root_avl, k, &comp_avl);
+
+		printf("%d %d %d\n", (int)comp_abb, (int)comp_avl, k);
+		fprintf(amostra, "%d %d %d\n", (int)comp_abb, (int)comp_avl, k);
+	    
+        comp_abb = 0;
+        comp_avl = 0;
+    }
+	
+    free_bt(root_abb);
+	free_avl(root_avl);
+	
+    fclose(amostra);
 	return 0;
 }
