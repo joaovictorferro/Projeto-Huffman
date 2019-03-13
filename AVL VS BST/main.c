@@ -55,7 +55,8 @@ int IsBalanced(node_t *node)
     return ( (-1 <= bf) && (bf <= 1) );
 }
 
-int BalanceFactor(node_t *node){
+int BalanceFactor(node_t *node)
+{
     if(node == NULL)
     { 
         return 0;
@@ -105,23 +106,22 @@ node_t *RightRot(node_t *node)
     return subtree;
 }
 
-node_t *AddNode(node_t *node, int v)
+node_t *AddNode(node_t *node, int item)
 {
-
     if(node == NULL)
     { 
-        return CreateNode(v);
+        return CreateNode(item);
     }
-    else if(node->value > v)
+    else if(node->value > item)
     { 
-    node->left = AddNode(node->left, v);
+        node->left = AddNode(node->left, item);
     }
     else
     { 
-        node->right = AddNode(node->right, v);
+        node->right = AddNode(node->right, item);
     }
     
-    node->height = height(node);
+    node -> height = height(node);
     node_t *child;
     int BF = BalanceFactor(node);
   
@@ -143,7 +143,6 @@ node_t *AddNode(node_t *node, int v)
         }
         node = LeftRot(node);
     }
-
     return node;
 }
 
@@ -234,15 +233,17 @@ binary_tree* search_abb(binary_tree *bt, int item, int *comparisons)
 
 //-----------------------------------------------------------------------------------------------//
 
-int main(){
-	int max_size, each;
-	printf("Tamanho maximo:");
+int main()
+{
+	int max_size;
+	
+    printf("Tamanho maximo:");
 	scanf("%d", &max_size);
 	
     FILE *amostra;
 	amostra = fopen("amostra.txt", "w");
 	
-    int i=0, j=0, k, media = 0, comp_abb = 0, cont = 0,comp_avl = 0,array[max_size];
+    int j = 0, k = 0, comp_abb = 0,comp_avl = 0,array[max_size];
 	fprintf(amostra, "ABB AVL Valor\n");
 		
     binary_tree* root_abb = NULL;
@@ -253,17 +254,10 @@ int main(){
 		array[j] = j;
 	}	
 	
-    for(j=0;j<=max_size;j++)
+    for(j=0;j < max_size;j++)
 	{
-	   if(j == 0)
-        {
-            root_abb = add(root_abb,array[j]);
-        }
-        else
-        {
-            root_abb = add(root_abb, array[j]);
-        }
-            root_avl = AddNode(root_avl,array[j]);	
+        root_abb = add(root_abb, array[j]);
+        root_avl = AddNode(root_avl,array[j]);	
 	}
 			
     for(j = 0; j < max_size; j++)
