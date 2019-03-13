@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 typedef struct binary_t binary_tree;
 struct binary_t
@@ -9,161 +12,150 @@ struct binary_t
 	struct binary_t *right;
 };
 
+typedef struct nodeTree node_t;
+struct nodeTree 
+{ 
+    int value;
+    int height; 
+    node_t *right,*left; 
+};
+
 //-------------------------------------AVL--------------------------------------------------------//
-binary_tree *create_binary_tree_avl(int value) 
-{
-    binary_tree *new_binary_tree = (binary_tree*) malloc(sizeof(binary_tree));
-    new_binary_tree->item = value;
-    new_binary_tree->left = NULL;
-    new_binary_tree->right = NULL;
 
-    return new_binary_tree;
+node_t *CreateNode(int item)
+{
+    node_t *newNode = (node_t*) malloc(sizeof(node_t));
+    newNode -> value = item;
+    newNode -> left = NULL; 
+    newNode -> right = NULL;
+    newNode -> height = 0;
+    return newNode;
 }
 
-int is_empty_binary_tree(binary_tree *bt) 
+int max(int a, int b)
 {
-    return (bt == NULL);
+  return a >= b ? a : b;
 }
 
-binary_tree *create_empty_binary_tree()
+int height(node_t *node)
 {
-    return NULL;
-}
-
-int avl_get(binary_tree *bt) 
-{
-    if (is_empty_binary_tree(bt))
+    if(node == NULL)
     {
-        return -1;
+     return -1;
     }
-    int left_height;
-    left_height = avl_get(bt->left);
-    int right_height;
-    right_height = avl_get(bt -> right);
+    else
+    { 
+        return 1 + max(height(node->left), height(node->right));
+    }
+}
+
+int IsBalanced(node_t *node)
+{
+    int bf = height(node->left) - height(node->right);
+    return ( (-1 <= bf) && (bf <= 1) );
+}
+
+int BalanceFactor(node_t *node){
+    if(node == NULL)
+    { 
+        return 0;
+    }
+    else if((node->left != NULL) && (node->right != NULL))
+    {
+        return node->left->height - node->right->height; 
+    }
+    else if((node->left != NULL) && (node->right == NULL))
+    {
+        return 1 + node->left->height;
+    }
+    else
+    { 
+        return (-node->right->height - 1);
+    }
+}       
+
+node_t *LeftRot(node_t *node)
+{
+    node_t *subtree = NULL;
+
+    if(node != NULL && node->right != NULL)
+    {
+        subtree = node->right;
+        node->right = subtree->left;
+        subtree->left = node;
+    }
+    subtree->height = height(subtree);
+    node -> height = height(node);
+    return subtree;
+}
+
+node_t *RightRot(node_t *node)
+{
+    node_t *subtree = NULL;
+
+    if(node != NULL && node->left != NULL)
+    {
+        subtree = node->left;
+        node->left = subtree->right;
+        subtree->right = node;
+    }
+
+    subtree->height = height(subtree);
+    node->height = height(node);
+    return subtree;
+}
+
+node_t *AddNode(node_t *node, int v)
+{
+
+    if(node == NULL)
+    { 
+        return CreateNode(v);
+    }
+    else if(node->value > v)
+    { 
+    node->left = AddNode(node->left, v);
+    }
+    else
+    { 
+        node->right = AddNode(node->right, v);
+    }
     
-    if (left_height > right_height)
+    node->height = height(node);
+    node_t *child;
+    int BF = BalanceFactor(node);
+  
+    if(BF == 2)
     {
-        return (left_height+1);
-    }
-    return (right_height+1);
-}
-
-binary_tree *rotate_left(binary_tree *bt) 
-{
-
-    binary_tree *new_binary_tree = create_empty_binary_tree();
-
-    if (!is_empty_binary_tree(bt) && !is_empty_binary_tree(bt->right)) 
-    {
-        new_binary_tree = bt->right;
-        bt->right = new_binary_tree->left;
-        new_binary_tree->left = bt;
-    }
-    return new_binary_tree;
-}
-
-binary_tree *rotate_right(binary_tree *bt) 
-{
-    binary_tree *new_binary_tree = create_empty_binary_tree();
-    if (!is_empty_binary_tree(bt) && !is_empty_binary_tree(bt->left)) 
-    {
-        new_binary_tree = bt->left;
-        bt->left = new_binary_tree->right;
-        new_binary_tree->right = bt;
-    }
-    return new_binary_tree;
-}
-
-int balance_factor_of_tree(binary_tree* bt) 
-{
-    if (!is_empty_binary_tree(bt))
-    {
-        return (avl_get(bt->left) - avl_get(bt->right));
-    }
-    return 0;
-}
-
-int avl(binary_tree* bt) 
-{
-    int balance_factor = balance_factor_of_tree(bt);
-
-    int right_avl=1;
-    int left_avl=1;
-
-    if (!is_empty_binary_tree(bt->left)) 
-    {
-        left_avl = avl(bt->left);
-    }
-    if (!is_empty_binary_tree(bt->right)) 
-    {
-        right_avl = avl(bt->right);
-    }
-    if (right_avl && left_avl)
-    {
-        return ((-2 < balance_factor) && (balance_factor < 2));
-    }
-    return 0;
-}
-
-binary_tree *insert_avl(binary_tree *bt, int value) 
-{
-    if (is_empty_binary_tree(bt)) 
-    {
-        bt = create_binary_tree_avl(value);
-    } 
-    else if (bt->item > value) 
-    {
-        bt->left = insert_avl(bt->left, value);
-    } 
-    else 
-    {
-        bt->right = insert_avl(bt->right, value);
-    }
-    return bt;
-}
-
-binary_tree *balance_binary_tree(binary_tree *avle) 
-{
-    if (!is_empty_binary_tree(avle->left) && !avl(avle->left)) 
-    {
-        avle->left = balance_binary_tree(avle->left);
-    }
-    if (!avl(avle) && !is_empty_binary_tree(avle->right) && !avl(avle->right)) 
-    {
-        avle->right = balance_binary_tree(avle->right);
-    }
-    if (!avl(avle))
-    {
-        if (balance_factor_of_tree(avle)>1)
+        child = node->left;
+        if(BalanceFactor(child) == -1)
         { 
-            if (balance_factor_of_tree(avle->left) < 0) 
-            { 
-                avle->left = rotate_left(avle->left);
-            }
-            avle = rotate_right(avle);
-        } 
-        else if (balance_factor_of_tree(avle)<1)
-        {
-            
-            if (balance_factor_of_tree(avle->right) > 0) 
-            {
-                avle->right = rotate_right(avle->right);
-            }
-
-            avle = rotate_left(avle);
+            node->left = LeftRot(child);
         }
+        node = RightRot(node);
     }
-    return avle;
-}   
+    else if(BF == -2)
+    {
+        child = node->right;
+        if(BalanceFactor(child) == 1)
+        { 
+            node->right = RightRot(child);
+        }
+        node = LeftRot(node);
+    }
 
-binary_tree* search_avl(binary_tree *avl, int item, int *comparisons)
+    return node;
+}
+
+
+node_t* search_avl(node_t *avl, int item, int *comparisons)
 {
-    if((avl == NULL) || (avl->item == item))
+    if((avl == NULL) || (avl->value == item))
     {
         ++*comparisons;
         return avl;
     }
-    else if(avl->item > item)
+    else if(avl->value > item)
     {
         ++*comparisons;
         return search_avl(avl->left, item, &*comparisons);
@@ -175,7 +167,12 @@ binary_tree* search_avl(binary_tree *avl, int item, int *comparisons)
     }
 }
 
-void free_avl(binary_tree *avl) 
+int is_empty_binary_tree(node_t *bt)
+{
+    return(bt == NULL);
+}
+
+void free_avl(node_t *avl) 
 {
     if(!is_empty_binary_tree(avl)) 
     {
@@ -237,13 +234,6 @@ binary_tree* search_abb(binary_tree *bt, int item, int *comparisons)
 
 //-----------------------------------------------------------------------------------------------//
 
-void swap(int *a, int *b) 
-{
-    int aux = *a;
-    *a = *b;
-    *b = aux;
-}
-
 int main(){
 	int max_size, each;
 	printf("Tamanho maximo:");
@@ -255,8 +245,8 @@ int main(){
     int i=0, j=0, k, media = 0, comp_abb = 0, cont = 0,comp_avl = 0,array[max_size];
 	fprintf(amostra, "ABB AVL Valor\n");
 		
-    binary_tree* root_abb = create_empty_binary_tree();
-	binary_tree* root_avl = create_empty_binary_tree();
+    binary_tree* root_abb = NULL;
+	node_t* root_avl = NULL;
 		
     for (j = 0; j <= max_size; j++)
 	{
@@ -265,26 +255,16 @@ int main(){
 	
     for(j=0;j<=max_size;j++)
 	{
-		if(j == 0)
-		{
-			root_abb = add(root_abb,array[j]);
-		}
-		else
-		{
-			root_abb = add(root_abb, array[j]);
-		}
-			root_avl = insert_avl(root_avl,array[j]);
-		
-        if (avl (root_avl)) 
-		{
-            //printf("Continuou AVL...\n  ");
-        } 
-        else 
+	   if(j == 0)
         {
-            //printf("ajustar balanceamento...\n  ");
-            root_avl = balance_binary_tree (root_avl);
+            root_abb = add(root_abb,array[j]);
         }
-    }
+        else
+        {
+            root_abb = add(root_abb, array[j]);
+        }
+            root_avl = AddNode(root_avl,array[j]);	
+	}
 			
     for(j = 0; j < max_size; j++)
 	{
@@ -301,7 +281,7 @@ int main(){
 	
     free_bt(root_abb);
 	free_avl(root_avl);
-	
     fclose(amostra);
+
 	return 0;
 }

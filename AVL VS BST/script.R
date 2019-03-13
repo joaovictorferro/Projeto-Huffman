@@ -1,3 +1,3 @@
 graf<-read.table("amostra.txt", header = TRUE, sep = " ")
-plot(graf$ABB~graf$Valor, main="Árvore Balanceada X Árvore Desbalanceada", xlab="Valores", ylab="Comparações", col="blue")
+plot(graf$ABB~graf$Valor, main="Árvore de Busca Binaria X Árvore Binaria de Busca Balanceada", xlab="Valores", ylab="Comparações", col="blue")
 points(graf$AVL~graf$Valor, col="red")
