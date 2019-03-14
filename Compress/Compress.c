@@ -164,7 +164,7 @@ void priorityEnqueue(pqueue *priorityQueue, huffmanTree *newTreeNode){
   node * new = (node*) malloc(sizeof(node));
   new->item = newTreeNode;
 
-  if(priorityQueue->head == NULL || ((huffmanTree*)new->item)->freq <= ((huffmanTree*)priorityQueue->head->item-)>freq){
+  if(priorityQueue->head == NULL || ((huffmanTree*)new->item)->freq <= ((huffmanTree*)priorityQueue->head->item)->freq){
     new->next = priorityQueue->head;
     priorityQueue->head = new;
   }
