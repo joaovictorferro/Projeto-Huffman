@@ -33,13 +33,19 @@ void eraseTree(huffmanTree *tree);
 
 int max(int a, int b);
 void eraseList(node * head);
-FILE *OpenFile();
+FILE *OpenFile(char name[]);
 
 void printTrashAndTreeSize(int treeSize, long long int Setted_Bits, FILE *FileBits);
 void printTreeInFile(huffmanTree *tree, int *treeSize, FILE *FileBits);
 void SetBit(unsigned char *bits, unsigned char binary, int pos);
 void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long long int *Setted_Bits);
-void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress);
+void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress, char name[]);
+
+void compressMain();
+void decompressMain();
+
+void header();
+void options();
 
 // v ------ DATATYPE ------ v
 
@@ -59,7 +65,7 @@ struct huffmanTree{
 };
 
 struct list_adt{
-  huffmanTree * treeNode;
+  void * item;
   node * next;
 };
 
@@ -71,59 +77,33 @@ struct priority_queue{
 
 void main(){
 
-  FILE *inputFile = OpenFile(); // Opening the input file in binary read mode.
-  long int * frequencyArray;
-  huffmanTree * huffmanRoot;
-  pqueue * priorityQueue = createPriorityQueue();
-  node * pqueueHead;
+  int choice, loop = 1;
+  
+  while(loop){
 
-while(1){
-    if(inputFile==NULL){
-      printf("ERROR: there is no file with the name typed. Type again the file's name.\n");
-      inputFile = OpenFile();
-    }
-    else{
-      printf("File found.\n");
-      frequencyArray = buildFrequency(inputFile);
-      int i;
-      huffmanTree * auxiliar;
+    system("clear || cls");
+    header();
+    options();
 
-      for(i = 0; i < ASCII_SIZE; i++){
-        if(frequencyArray[i]){           // Adds a new node to the heap if the frequency of the char is >= 1.
-          auxiliar = newNode( i, frequencyArray[i]);
-          priorityEnqueue(priorityQueue,auxiliar);
-        }
-      }
+    scanf("%d", &choice);
+    getchar();
 
-      pqueueHead = priorityQueue->head;
+    switch (choice){
 
-      huffmanRoot = buildHuffmanTree(priorityQueue);
+      case 1:
+        compressMain();
+        break;
 
-      free(priorityQueue);
+      case 2:
+        //decompressMain();
+        break;
 
-      printTree(huffmanRoot);
-      printf("\n");
+      case 3:
+        loop = 0;
+        break;
 
-      int rootHeight = height(huffmanRoot);
-
-      hash * hashTable = createHash(rootHeight+1);
-
-      unsigned char auxiliarString[rootHeight+1];
-
-      buildHash(hashTable,huffmanRoot,0,auxiliarString);
-
-      for(i=0;i<ASCII_SIZE;i++){
-        if(hashTable->items[i]->characterFrequency){
-          printf("%c %s\n", i, hashTable->items[i]->binaryCode);
-        }
-      }
-
-      StartCompress(hashTable, huffmanRoot, inputFile);
-      eraseHash(hashTable);
-      eraseTree(huffmanRoot);
-
-      printf("ok\n");
-      return;
+      default:
+        break;
     }
   }
 }
@@ -182,16 +162,16 @@ pqueue *createPriorityQueue(){
 void priorityEnqueue(pqueue *priorityQueue, huffmanTree *newTreeNode){
 
   node * new = (node*) malloc(sizeof(node));
-  new->treeNode = newTreeNode;
+  new->item = newTreeNode;
 
-  if(priorityQueue->head == NULL || new->treeNode->freq <= priorityQueue->head->treeNode->freq){
+  if(priorityQueue->head == NULL || ((huffmanTree*)new->item)->freq <= ((huffmanTree*)priorityQueue->head->item-)>freq){
     new->next = priorityQueue->head;
     priorityQueue->head = new;
   }
   else{
     node * current = priorityQueue->head;
 
-    while(current->next != NULL && current->next->treeNode->freq < new->treeNode->freq){
+    while(current->next != NULL && ((huffmanTree*)current->next->item)->freq < ((huffmanTree*)new->item)->freq){
       current = current->next;
     }
 
@@ -210,7 +190,7 @@ huffmanTree *priorityDequeue(pqueue *priorityQueue){
     node * auxiliar = priorityQueue->head;
     priorityQueue->head = priorityQueue->head->next;
     auxiliar->next = NULL;
-    huffmanTree * returnNode = auxiliar->treeNode;
+    huffmanTree * returnNode = (huffmanTree*)auxiliar->item;
     free(auxiliar);
     return returnNode;
   }
@@ -274,7 +254,7 @@ huffmanTree *buildHuffmanTree(pqueue *priorityQueue){
     priorityEnqueue(priorityQueue,enqueued);
   }
 
-  return priorityQueue->head->treeNode;
+  return (huffmanTree*)priorityQueue->head->item;
 }
 
 void printTree(huffmanTree *tree){
@@ -312,9 +292,8 @@ void eraseList(node * head){
   }
 }
 
-FILE *OpenFile(){
+FILE *OpenFile(char name[]){
     printf("Type the input file name:\n");
-    char name[100];
     fgets(name,100,stdin);
     int l = strlen(name);
     name[l-1] = '\0';
@@ -416,9 +395,10 @@ void printTrashAndTreeSize(int treeSize, long long int Setted_Bits, FILE *FileBi
   fprintf(FileBits, "%c%c", first, second);
 }
 
-void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress){
+void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress, char name[]){
   rewind(FileToCompress);
-  FILE *FileBits = fopen("File_With_Bits_Only.huff", "wb");
+  strcat(name,".huff");
+  FILE *FileBits = fopen(name, "wb");
   fseek(FileBits, 2*sizeof(unsigned char), SEEK_SET);
 
   int treeSize = 0;
@@ -434,4 +414,87 @@ void StartCompress(hash *hashTable, huffmanTree *root, FILE *FileToCompress){
   fclose(FileBits);
 }
 
+void compressMain(){
+
+  char name[100];
+  FILE *inputFile = OpenFile(name); // Opening the input file in binary read mode.
+  long int * frequencyArray;
+  huffmanTree * huffmanRoot;
+  pqueue * priorityQueue = createPriorityQueue();
+  node * pqueueHead;
+
+while(1){
+    if(inputFile==NULL){
+      printf("ERROR: there is no file with the name typed. Type again the file's name.\n");
+      inputFile = OpenFile(name);
+    }
+    else{
+      printf("File found.\n");
+      frequencyArray = buildFrequency(inputFile);
+      int i;
+      huffmanTree * auxiliar;
+
+      for(i = 0; i < ASCII_SIZE; i++){
+        if(frequencyArray[i]){           // Adds a new node to the heap if the frequency of the char is >= 1.
+          auxiliar = newNode( i, frequencyArray[i]);
+          priorityEnqueue(priorityQueue,auxiliar);
+        }
+      }
+
+      pqueueHead = priorityQueue->head;
+
+      huffmanRoot = buildHuffmanTree(priorityQueue);
+
+      free(priorityQueue);
+
+      printTree(huffmanRoot);
+      printf("\n");
+
+      int rootHeight = height(huffmanRoot);
+
+      hash * hashTable = createHash(rootHeight+1);
+
+      unsigned char auxiliarString[rootHeight+1];
+
+      buildHash(hashTable,huffmanRoot,0,auxiliarString);
+
+      for(i=0;i<ASCII_SIZE;i++){
+        if(hashTable->items[i]->characterFrequency){
+          printf("%c %s\n", i, hashTable->items[i]->binaryCode);
+        }
+      }
+
+      StartCompress(hashTable, huffmanRoot, inputFile, name);
+      eraseHash(hashTable);
+      eraseTree(huffmanRoot);
+
+      printf("ok\n");
+      return;
+    }
+  }
+}
+
 // ^ ------ COMPRESS ------ ^
+
+// V ------ INTERFACE ------ V
+
+void header(){
+  printf("|------------------------------------------------------------------------------------------------|\n");
+  printf("| **     **  **    **  ********   ********       **       **               **        ****     ** |\n");
+  printf("| **     **  **    **  **         **           ** **    ** **            ** **       ** **    ** |\n");
+  printf("| **     **  **    **  **         **          **    ** **   **          **   **      **  **   ** |\n");
+  printf("| *********  **    **  ********   ********   **      **      **        *********     **   **  ** |\n");
+  printf("| **     **  **    **  **         **        **                **      **       **    **    ** ** |\n");
+  printf("| **     **  **    **  **         **       **                  **    **         **   **     **** |\n");
+  printf("| **     **  ********  **         **      **                    **  **           **  **       ** |\n");
+  printf("|                                                                                                |\n");
+  printf("|                       Joao Victor - Lucas Massa - William Philippe                             |\n"); 
+  printf("|------------------------------------------------------------------------------------------------|\n");
+}
+
+void options(){
+  printf("Choose an option by typing the corresponding number:\n");
+  printf("(1) -> COMPRESS.\n");
+  printf("(2) -> DECOMPRESS.\n");
+  printf("(3) -> EXIT PROGRAM.\n");
+}
