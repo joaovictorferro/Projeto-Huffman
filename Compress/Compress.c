@@ -50,27 +50,27 @@ void options();
 // v ------ DATATYPE ------ v
 
 struct hash_element{
-  unsigned char * binaryCode;
+  void * binaryCode;
   long int characterFrequency;
 };
 
 struct hash_table{
-  helement * items[ASCII_SIZE];
+  void * items[ASCII_SIZE];
 };
 
 struct huffmanTree{
   long int freq;
   unsigned char element;
-  huffmanTree * left, *right;
+  void * left, *right;
 };
 
 struct list_adt{
   void * item;
-  node * next;
+  void * next;
 };
 
 struct priority_queue{
-  node * head;
+  void * head;
 };
 
 // ^ ------ DATATYPE ------ ^
@@ -115,8 +115,8 @@ hash *createHash(int maximumSize){
   int i;
   for(i = 0; i < ASCII_SIZE; i++){
     new->items[i] = (helement *) malloc(sizeof(helement));
-    new->items[i]->characterFrequency = 0;
-    new->items[i]->binaryCode = (unsigned char *) calloc(maximumSize,sizeof(unsigned char)); 
+    ((helement*)new->items[i])->characterFrequency = 0;
+    ((helement*)new->items[i])->binaryCode = (unsigned char *) calloc(maximumSize,sizeof(unsigned char)); 
   }
   return new;
 }
@@ -125,8 +125,8 @@ void buildHash(hash *hashTable, huffmanTree *huffmanNode, int position, unsigned
 
   if(isLeaf(huffmanNode)){
     auxiliarString[position] = '\0';
-    strncpy(hashTable->items[huffmanNode->element]->binaryCode,auxiliarString,position+1);
-    hashTable->items[huffmanNode->element]->characterFrequency = huffmanNode->freq;
+    strncpy(((helement*)hashTable->items[huffmanNode->element])->binaryCode,auxiliarString,position+1);
+    ((helement*)hashTable->items[huffmanNode->element])->characterFrequency = huffmanNode->freq;
     return;
   }
   if(huffmanNode->left!=NULL){
@@ -143,7 +143,7 @@ void buildHash(hash *hashTable, huffmanTree *huffmanNode, int position, unsigned
 void eraseHash(hash * hashTable){
   int i;
   for(i=0;i<ASCII_SIZE;i++){
-    free(hashTable->items[i]->binaryCode);
+    free(((helement*)hashTable->items[i])->binaryCode);
     free(hashTable->items[i]);
   }
   free(hashTable);
@@ -164,14 +164,14 @@ void priorityEnqueue(pqueue *priorityQueue, huffmanTree *newTreeNode){
   node * new = (node*) malloc(sizeof(node));
   new->item = newTreeNode;
 
-  if(priorityQueue->head == NULL || ((huffmanTree*)new->item)->freq <= ((huffmanTree*)priorityQueue->head->item)->freq){
+  if(priorityQueue->head == NULL || ((huffmanTree*)new->item)->freq <= ((huffmanTree*)((node*)priorityQueue->head)->item)->freq){
     new->next = priorityQueue->head;
     priorityQueue->head = new;
   }
   else{
     node * current = priorityQueue->head;
 
-    while(current->next != NULL && ((huffmanTree*)current->next->item)->freq < ((huffmanTree*)new->item)->freq){
+    while(current->next != NULL && ((huffmanTree*)((node*)current->next)->item)->freq < ((huffmanTree*)new->item)->freq){
       current = current->next;
     }
 
@@ -180,7 +180,7 @@ void priorityEnqueue(pqueue *priorityQueue, huffmanTree *newTreeNode){
   } 
 }
 
-huffmanTree *priorityDequeue(pqueue *priorityQueue){
+huffmanTree * priorityDequeue(pqueue *priorityQueue){
 
   if(priorityQueue->head == NULL){
     printf("PRIORITY QUEUE UNDERFLOW!\n");
@@ -188,7 +188,7 @@ huffmanTree *priorityDequeue(pqueue *priorityQueue){
   }
   else{
     node * auxiliar = priorityQueue->head;
-    priorityQueue->head = priorityQueue->head->next;
+    priorityQueue->head = ((node*)priorityQueue->head)->next;
     auxiliar->next = NULL;
     huffmanTree * returnNode = (huffmanTree*)auxiliar->item;
     free(auxiliar);
@@ -239,7 +239,7 @@ huffmanTree *buildHuffmanTree(pqueue *priorityQueue){
   huffmanTree * second_dequeued;
   int frequency;
 
-  while(priorityQueue->head->next != NULL){                    
+  while(((node*)priorityQueue->head)->next != NULL){                    
 
     first_dequeued = priorityDequeue(priorityQueue);
     second_dequeued = priorityDequeue(priorityQueue);
@@ -254,7 +254,7 @@ huffmanTree *buildHuffmanTree(pqueue *priorityQueue){
     priorityEnqueue(priorityQueue,enqueued);
   }
 
-  return (huffmanTree*)priorityQueue->head->item;
+  return (huffmanTree*)((node*)priorityQueue->head)->item;
 }
 
 void printTree(huffmanTree *tree){
@@ -339,10 +339,10 @@ void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long lon
   while( fscanf(FileToCompress, "%c", &character) != EOF ){
 
     int i = 0;
-    while( hashTable->items[character]->binaryCode[i] != '\0' ){
+    while(((unsigned char *)((helement*)hashTable->items[character])->binaryCode)[i] != '\0' ){
 
       (*Setted_Bits) ++;
-      SetBit(&bits, hashTable->items[character]->binaryCode[i], 
+      SetBit(&bits, ((unsigned char *)((helement*)hashTable->items[character])->binaryCode)[i], 
              (*Setted_Bits) % 8 == 0 ? 8 : (*Setted_Bits) % 8 );
 
       if( (*Setted_Bits) % 8 == 0 ){ //Byte is setted
@@ -459,8 +459,8 @@ while(1){
       buildHash(hashTable,huffmanRoot,0,auxiliarString);
 
       for(i=0;i<ASCII_SIZE;i++){
-        if(hashTable->items[i]->characterFrequency){
-          printf("%c %s\n", i, hashTable->items[i]->binaryCode);
+        if(((helement*)hashTable->items[i])->characterFrequency){
+          printf("%c %s\n", i, (unsigned char *)((helement*)hashTable->items[i])->binaryCode);
         }
       }
 
