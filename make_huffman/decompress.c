@@ -214,14 +214,14 @@ void decompressMain()
 	
 	if (input_file == NULL) 
 	{
-		printf("não foi possível ler o arquivo");
+		printf("não foi possível ler o arquivo\n");
 		return;
 	}
 
 	output_file = removerhuff(name);	
 	if (output_file == NULL) 
 	{
-		printf("não foi possível escrever no arquivo");
+		printf("não foi possível escrever no arquivo\n");
 		return; 
 	}
 	unsigned int trash_size = get_trash_size(input_file);
