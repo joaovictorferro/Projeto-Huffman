@@ -21,13 +21,13 @@ void free_tree(node_t *huff_tree)
 }
 
 /* verifica se o nó é uma folha ou não*/
-int is_leaf(node_t *binary_tree) 
+int is_leaf_decompress(node_t *binary_tree) 
 {
 	return ((binary_tree != NULL) && (binary_tree->left == NULL) && (binary_tree->right == NULL));
 }
 
 /* verificar se o bit esta setado na posiçao ou nao*/
-int is_bit_set(unsigned int character, int position) 
+int is_bit_set_decompress(unsigned int character, int position) 
 {
 	unsigned int mask = 1 << position;
 	return (mask & character);
@@ -45,23 +45,25 @@ void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huf
 	unsigned int current_byte;
 	unsigned int character;
 	unsigned int last_byte; 
-	int bytes_total; 
-	int bytes; 
+	long long int bytes_total; 
+	long long int bytes; 
 	int i; 
 
 	fseek(input_file, -1, SEEK_END);
 	last_byte = getc(input_file);
 	bytes_total = ftell(input_file);
-
+	//printf("%lli\n", bytes_total);
+	//return ;
 	fseek(input_file, (2+tree_size),0);
 
 	current_byte = getc(input_file);
 	for (bytes = (2+tree_size); bytes < (bytes_total - 1); bytes++) 
 	{
+		//printf("%lli\n",bytes);
 		for (i = 7; i >= 0; i--) 
 		{
 			/* se o bit estiver setado, anda para a direita na árvore */
-			if (is_bit_set(current_byte, i) != 0) 
+			if (is_bit_set_decompress(current_byte, i) != 0) 
 			{
 				if (current_node->right != NULL)
 				{
@@ -71,9 +73,11 @@ void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huf
 			else 
 			{
 				if (current_node->left != NULL)
+				{
 					current_node = current_node->left;
+				}
 			}
-			if (is_leaf(current_node) != 0) 
+			if (is_leaf_decompress(current_node) != 0) 
 			{
 				fprintf(output_file, "%c", current_node->character);
 				current_node = huff_tree;
@@ -81,10 +85,11 @@ void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huf
 		}
 		current_byte = getc(input_file);
 	}
+	printf("Sai para ler o lixo\n");
 
-	for (i = 7; i >= (unsigned int)trash_size; i--) 
+	for (i = 7; i >= (signed int)trash_size; i--) 
 	{
-		if (is_bit_set(current_byte, i) != 0) 
+		if (is_bit_set_decompress(current_byte, i) != 0) 
 		{
 			if (current_node->right != NULL)
 			{
@@ -98,13 +103,14 @@ void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huf
 				current_node = current_node->left;
 			}
 		}
-		if (is_leaf(current_node) != 0) 
+		if (is_leaf_decompress(current_node) != 0) 
 		{
 			fprintf(output_file, "%c", current_node->character);
 			current_node = huff_tree;
 		}
 	}
-	
+	printf("Decompress ok!!");
+	return ;
 }
 
 unsigned int get_trash_size(FILE *input_file) 
@@ -168,7 +174,6 @@ node_t *build_tree(unsigned int **tree_array)
 	{
 		*tree_array = (*tree_array + 1);
 		return (create_node(**tree_array, NULL, NULL));
-
 	}
 	return (create_node(**tree_array, NULL, NULL)); 
 }
@@ -192,12 +197,13 @@ node_t *get_tree(FILE *input_file, unsigned int tree_size)
 
 	return (tree_root);
 }
+
 FILE* removerhuff(char name[])
 {
 	int n;
 	n = strlen(name);
 	name[n-5] = '\0';
-	return fopen(name,"wb+");;
+	return fopen(name,"wb");;
 }
 
 int decompressMain()

@@ -21,9 +21,9 @@ node_t *create_node(unsigned int character, node_t *left, node_t *right);
 
 void free_tree(node_t *huff_tree);
 
-int is_leaf(node_t *binary_tree);
+int is_leaf_decompress(node_t *binary_tree);
 
-int is_bit_set(unsigned int character, int position); 
+int is_bit_set_decompress(unsigned int character, int position); 
 
 void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huff_tree, FILE *output_file);
 
