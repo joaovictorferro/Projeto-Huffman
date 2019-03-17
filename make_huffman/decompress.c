@@ -206,7 +206,7 @@ FILE* removerhuff(char name[])
 	return fopen(name,"wb");;
 }
 
-int decompressMain()
+void decompressMain()
 {
 	char name[100],string;
 	FILE *input_file = OpenFile(name);
@@ -215,14 +215,14 @@ int decompressMain()
 	if (input_file == NULL) 
 	{
 		printf("não foi possível ler o arquivo");
-		return 0;
+		return;
 	}
 
 	output_file = removerhuff(name);	
 	if (output_file == NULL) 
 	{
 		printf("não foi possível escrever no arquivo");
-		return 0; 
+		return; 
 	}
 	unsigned int trash_size = get_trash_size(input_file);
 
@@ -235,5 +235,4 @@ int decompressMain()
 	free_tree(huff_tree);
 	fclose(input_file);
 	fclose(output_file);
-	return 0;
 }
