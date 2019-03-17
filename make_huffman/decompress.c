@@ -109,7 +109,7 @@ void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huf
 			current_node = huff_tree;
 		}
 	}
-	printf("Decompress ok!!");
+	printf("Decompress ok!!\n");
 	return ;
 }
 
