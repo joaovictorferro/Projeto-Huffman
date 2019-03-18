@@ -1,0 +1,1 @@
+gcc p_queue.c p_queue.h	hash.c hash.h	tree.h tree.c	main.c	compress.c compress.h	decompress.c decompress.h	utilities.c utilities.h -o	main -lm
