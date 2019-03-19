@@ -85,7 +85,6 @@ void decom(FILE *input_file, unsigned int trash_size, int tree_size, node_t *huf
 		}
 		current_byte = getc(input_file);
 	}
-	printf("Sai para ler o lixo\n");
 
 	for (i = 7; i >= (signed int)trash_size; i--) 
 	{
@@ -198,7 +197,7 @@ node_t *get_tree(FILE *input_file, unsigned int tree_size)
 	return (tree_root);
 }
 
-FILE* removerhuff(char name[])
+FILE* removehuff(char name[])
 {
 	int n;
 	n = strlen(name);
@@ -211,28 +210,30 @@ void decompressMain()
 	char name[100],string;
 	FILE *input_file = OpenFile(name);
 	FILE *output_file; 
+	int loop = 1;
 	
-	if (input_file == NULL) 
-	{
-		printf("não foi possível ler o arquivo\n");
-		return;
-	}
+	while(loop)
+		if (input_file == NULL) 
+		{
+			printf("ERROR: there is no file with the name typed. Type again the file's name.\n");
+			input_file = OpenFile(name);
+		}	
+		
+		else
+		{
+			printf("file found.\n");
+			output_file = removehuff(name);
+			unsigned int trash_size = get_trash_size(input_file);
 
-	output_file = removerhuff(name);	
-	if (output_file == NULL) 
-	{
-		printf("não foi possível escrever no arquivo\n");
-		return; 
-	}
-	unsigned int trash_size = get_trash_size(input_file);
+			unsigned int tree_size = get_tree_size(input_file);
 
-	unsigned int tree_size = get_tree_size(input_file);
+			node_t *huff_tree = get_tree(input_file, tree_size);
+			
+			decom(input_file, trash_size, tree_size, huff_tree, output_file);
 
-	node_t *huff_tree = get_tree(input_file, tree_size);
-	
-	decom(input_file, trash_size, tree_size, huff_tree, output_file);
-
-	free_tree(huff_tree);
-	fclose(input_file);
-	fclose(output_file);
+			free_tree(huff_tree);
+			fclose(input_file);
+			fclose(output_file);
+			loop = 0;
+		}
 }
