@@ -14,7 +14,7 @@ typedef struct hash_table hash;
 typedef struct hash_element helement;
 
 struct hash_table{
-  void * items[ASCII_SIZE];
+  helement * items[ASCII_SIZE];
 };
 
 struct hash_element{
