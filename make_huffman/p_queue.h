@@ -13,13 +13,13 @@ typedef struct list_adt node;
 
 struct priority_queue
 {
-  void * head;
+  node * head;
 };
 
 struct list_adt
 {
   void * item;
-  void * next;
+  node * next;
 };
 
 
