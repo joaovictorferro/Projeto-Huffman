@@ -13,7 +13,7 @@ struct huffmanTree
 {
   long int freq;
   unsigned char element;
-  void * left, *right;
+  huffmanTree * left, *right;
 };
 
 int max(int a, int b);
