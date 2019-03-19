@@ -37,6 +37,8 @@ node_t *build_tree(unsigned int **tree_array);
 
 node_t *get_tree(FILE *input_file, unsigned int tree_size);
 
+FILE* removehuff(char name[]);
+
 void decompressMain();
 
 #endif
