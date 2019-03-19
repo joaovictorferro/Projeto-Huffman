@@ -18,8 +18,8 @@ void buildHash(hash *hashTable, huffmanTree *huffmanNode, int position, unsigned
 
   if(isLeaf(huffmanNode)){
     auxiliarString[position] = '\0';
-    strncpy(((helement*)hashTable->items[huffmanNode->element])->binaryCode,auxiliarString,position+1);
-    ((helement*)hashTable->items[huffmanNode->element])->characterFrequency = huffmanNode->freq;
+    strncpy(hashTable->items[huffmanNode->element]->binaryCode,auxiliarString,position+1);
+    hashTable->items[huffmanNode->element]->characterFrequency = huffmanNode->freq;
     return;
   }
   if(huffmanNode->left!=NULL){
