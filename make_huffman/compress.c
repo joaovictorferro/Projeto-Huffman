@@ -21,7 +21,7 @@ huffmanTree *buildHuffmanTree(pqueue *priorityQueue){
   huffmanTree * second_dequeued;
   int frequency;
 
-  while(((node*)priorityQueue->head)->next != NULL){                    
+  while(priorityQueue->head->next != NULL){                    
 
     first_dequeued = priorityDequeue(priorityQueue);
     second_dequeued = priorityDequeue(priorityQueue);
@@ -36,7 +36,7 @@ huffmanTree *buildHuffmanTree(pqueue *priorityQueue){
     priorityEnqueue(priorityQueue,enqueued);
   }
 
-  return (huffmanTree*)((node*)priorityQueue->head)->item;
+  return (huffmanTree*)priorityQueue->head->item;
 }
 
 void printTreeInFile(huffmanTree *tree, int *treeSize, FILE *FileBits){
@@ -75,10 +75,10 @@ void Compressing(FILE *FileToCompress, FILE *FileBits, hash *hashTable, long lon
   while( fscanf(FileToCompress, "%c", &character) != EOF ){
 
     int i = 0;
-    while(((unsigned char *)((helement*)hashTable->items[character])->binaryCode)[i] != '\0' ){
+    while(((unsigned char *)hashTable->items[character]->binaryCode)[i] != '\0' ){
 
       (*Setted_Bits) ++;
-      SetBit(&bits, ((unsigned char *)((helement*)hashTable->items[character])->binaryCode)[i], 
+      SetBit(&bits, ((unsigned char *)hashTable->items[character]->binaryCode)[i], 
              (*Setted_Bits) % 8 == 0 ? 8 : (*Setted_Bits) % 8 );
 
       if( (*Setted_Bits) % 8 == 0 ){ //Byte is setted
@@ -158,8 +158,9 @@ void compressMain(){
   huffmanTree * huffmanRoot;
   pqueue * priorityQueue = createPriorityQueue();
   node * pqueueHead;
+  int loop = 1;
 
-while(1)
+while(loop)
   {
     if(inputFile==NULL){
       printf("ERROR: there is no file with the name typed. Type again the file's name.\n");
@@ -196,7 +197,7 @@ while(1)
       buildHash(hashTable,huffmanRoot,0,auxiliarString);
 
       for(i=0;i<ASCII_SIZE;i++){
-        if(((helement*)hashTable->items[i])->characterFrequency){
+        if(hashTable->items[i]->characterFrequency){
           printf("%c %s\n", i, (unsigned char *)((helement*)hashTable->items[i])->binaryCode);
         }
       }
@@ -206,7 +207,7 @@ while(1)
       eraseTree(huffmanRoot);
 
       printf("ok\n");
-      return;
+      loop = 0;
     }
   }
 }
