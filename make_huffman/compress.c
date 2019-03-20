@@ -157,7 +157,6 @@ void compressMain(){
   long int * frequencyArray;
   huffmanTree * huffmanRoot;
   pqueue * priorityQueue = createPriorityQueue();
-  node * pqueueHead;
   int loop = 1;
 
 while(loop)
@@ -178,8 +177,6 @@ while(loop)
           priorityEnqueue(priorityQueue,auxiliar);
         }
       }
-
-      pqueueHead = priorityQueue->head;
 
       huffmanRoot = buildHuffmanTree(priorityQueue);
 
