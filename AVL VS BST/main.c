@@ -248,16 +248,11 @@ int main()
 		
     binary_tree* root_abb = NULL;
 	node_t* root_avl = NULL;
-		
-    for (j = 0; j <= max_size; j++)
-	{
-		array[j] = j;
-	}	
 	
     for(j=0;j < max_size;j++)
-	{
-        root_abb = add(root_abb, array[j]);
-        root_avl = AddNode(root_avl,array[j]);	
+	{  
+        root_abb = add(root_abb, j);
+        root_avl = AddNode(root_avl, j);	
 	}
 			
     for(j = 0; j < max_size; j++)
