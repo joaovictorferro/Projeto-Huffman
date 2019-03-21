@@ -5,6 +5,10 @@ HASH = hash.c hash.h
 COMPRESS = compress.c compress.h
 DESCOMPRESS = decompress.c decompress.h
 UTI = utilities.c utilities.h
+TEST = CUnitTest.c
 
 de_comprimir:
 	gcc $(P_QUEUE)	$(HASH)	$(TREE)	$(MAIN)	$(COMPRESS)	$(DESCOMPRESS)	$(UTI) -o	main -lm
+
+test:
+		gcc $(P_QUEUE)	$(HASH)	$(TREE)	$(COMPRESS)	$(DESCOMPRESS)	$(UTI) $(TEST) -o	test -lm -lcunit
