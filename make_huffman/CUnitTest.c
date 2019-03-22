@@ -113,13 +113,12 @@ void p_queue_tests(){
 	auxiliar = newNode('e', 1);
 	priorityEnqueue(priorityQueue,auxiliar);
 	
-	/*
-	CU_ASSERT((node*)priorityQueue->head->next->item == 'e'); ERRADO
-	CU_ASSERT(((huffmanTree*)((node*)priorityQueue->head)->item)->freq == 1);
-	CU_ASSERT(((huffmanTree*)(((node*)((pqueue*)priorityQueue->head)->next->item)) == 'c')); ERRADO
-	CU_ASSERT(((huffmanTree*)((node*)priorityQueue->head)->next->item)->freq == 1); ERRADO 
-
-	*/
+	
+	CU_ASSERT(((huffmanTree*)priorityQueue->head->item)->element == 'e'); 
+	CU_ASSERT(((huffmanTree*)priorityQueue->head->item)->freq == 1);
+	CU_ASSERT(((huffmanTree*)priorityQueue->head->next->item)->element == 'c');
+	CU_ASSERT(((huffmanTree*)priorityQueue->head->next->item)->freq == 1); 
+	
 
 	//testando dequeue
 	huffmanTree *node_teste = priorityDequeue(priorityQueue);
