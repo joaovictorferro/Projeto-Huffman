@@ -147,7 +147,7 @@ node_t *AddNode(node_t *node, int item)
 }
 
 
-node_t* search_avl(node_t *avl, int item, int *comparisons)
+node_t* search_avl(node_t *avl, long int item, long int *comparisons)
 {
     if((avl == NULL) || (avl->value == item))
     {
@@ -217,7 +217,7 @@ binary_tree* add(binary_tree *bt, int item)
 	return bt;
 }
 
-binary_tree* search_abb(binary_tree *bt, int item, int *comparisons)
+binary_tree* search_abb(binary_tree *bt, long int item, long int *comparisons)
 {
 	if((bt == NULL) || (bt->item == item)){
 		++*comparisons;
@@ -235,22 +235,23 @@ binary_tree* search_abb(binary_tree *bt, int item, int *comparisons)
 
 int main()
 {
-	int max_size;
+	long int max_size;
 	
     printf("Tamanho maximo:");
-	scanf("%d", &max_size);
+	scanf("%ld", &max_size);
 	
     FILE *amostra;
 	amostra = fopen("amostra.txt", "w");
 	
-    int j = 0, k = 0, comp_abb = 0,comp_avl = 0,array[max_size];
+    int j = 0;
+    long int comp_abb = 0,comp_avl = 0,array[max_size], k = 0;
 	fprintf(amostra, "ABB AVL Valor\n");
 		
     binary_tree* root_abb = NULL;
-	node_t* root_avl = NULL;
+	node_t* root_avl = NULL;	
 	
     for(j=0;j < max_size;j++)
-	{  
+	{
         root_abb = add(root_abb, j);
         root_avl = AddNode(root_avl, j);	
 	}
@@ -261,8 +262,8 @@ int main()
 		search_abb(root_abb, k, &comp_abb);
 		search_avl(root_avl, k, &comp_avl);
 
-		printf("%d %d %d\n", (int)comp_abb, (int)comp_avl, k);
-		fprintf(amostra, "%d %d %d\n", (int)comp_abb, (int)comp_avl, k);
+		//printf("%d %d %d\n", (int)comp_abb, (int)comp_avl, k);
+		fprintf(amostra, "%ld %ld %ld\n", (long int)comp_abb, (long int)comp_avl, k);
 	    
         comp_abb = 0;
         comp_avl = 0;
