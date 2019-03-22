@@ -127,7 +127,7 @@ void p_queue_tests(){
 	node_teste = priorityDequeue(priorityQueue);
 	CU_ASSERT(node_teste->element == 'c');
 	CU_ASSERT(node_teste->freq == 1);
-	//CU_ASSERT((((node*)priorityQueue->head)->next->item) == 'b'); ERRADO
+	CU_ASSERT(((huffmanTree*)priorityQueue->head->item)->element == 'b');
 }
 
 int run_tests(){
