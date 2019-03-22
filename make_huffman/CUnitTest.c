@@ -21,12 +21,114 @@ void hash_tests() {
 	CU_ASSERT(newHash != NULL);
 }
 
-void huff_tree_tests(){
+void generate_tree_test_string(huffmanTree *huffmanRoot, char *string, int *size) {
+	if(huffmanRoot == NULL) {
+		string[*size] = '\0';
+		return;
+	} else {
+		if(isLeaf(huffmanRoot)) {
+			string[*size] = huffmanRoot-> element;
+			*size += 1;
+		}
+		generate_tree_test_string(huffmanRoot->left,string,size);		
+		generate_tree_test_string(huffmanRoot->right,string,size);
+	}
+}
 
+huffmanTree *build_tree_test(pqueue *priorityQueue){
+
+  huffmanTree * first_dequeued;
+  huffmanTree * second_dequeued;
+  int frequency;
+
+  while(((node*)priorityQueue->head)->next != NULL){                    
+
+    first_dequeued = priorityDequeue(priorityQueue);
+    second_dequeued = priorityDequeue(priorityQueue);
+
+    frequency = (first_dequeued->freq) + (second_dequeued->freq);
+
+    huffmanTree * enqueued = newNode('*',frequency);
+
+    enqueued->left = first_dequeued;
+    enqueued->right = second_dequeued;
+
+    priorityEnqueue(priorityQueue,enqueued);
+  }
+
+  return (huffmanTree*)((node*)priorityQueue->head)->item;
+}
+
+void  huff_tree_tests () {
+	pqueue * priorityQueue = createPriorityQueue();
+	char string_test[10], string_compare[10];
+	int i, size = 0;
+	huffmanTree *huffmanRoot;
+	huffmanTree *auxiliar;
+
+	auxiliar = newNode('a',5);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('b',2);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('c',1);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('d',3);
+	priorityEnqueue(priorityQueue,auxiliar);
+
+	for(i = 0; i < 10; i++) 
+	{
+		string_test[i] = '0';
+		string_compare[i] = '0';
+	}
+	
+	huffmanRoot = build_tree_test(priorityQueue);
+
+	string_compare[0] = 'a';
+	string_compare[1] = 'c';
+	string_compare[2] = 'b';
+	string_compare[3] = 'd';
+	string_compare[4] = '\0';
+
+	generate_tree_test_string(huffmanRoot, string_test, &size);
+	CU_ASSERT(strcmp(string_test,string_compare) == 0);
 }
 
 void p_queue_tests(){
+	pqueue *priorityQueue = createPriorityQueue();
+	huffmanTree *auxiliar = NULL;
 
+	//testando create_p_queue
+	CU_ASSERT(priorityQueue != NULL);
+	CU_ASSERT(priorityQueue->head == NULL);
+
+	//testando enqueue
+	auxiliar = newNode('a',5);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('b',2);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('c',1);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('d',3);
+	priorityEnqueue(priorityQueue,auxiliar);
+	auxiliar = newNode('e', 1);
+	priorityEnqueue(priorityQueue,auxiliar);
+	
+	/*
+	CU_ASSERT((node*)priorityQueue->head->next->item == 'e'); ERRADO
+	CU_ASSERT(((huffmanTree*)((node*)priorityQueue->head)->item)->freq == 1);
+	CU_ASSERT(((huffmanTree*)(((node*)((pqueue*)priorityQueue->head)->next->item)) == 'c')); ERRADO
+	CU_ASSERT(((huffmanTree*)((node*)priorityQueue->head)->next->item)->freq == 1); ERRADO 
+
+	*/
+
+	//testando dequeue
+	huffmanTree *node_teste = priorityDequeue(priorityQueue);
+	CU_ASSERT(node_teste->element == 'e');
+	CU_ASSERT(node_teste->freq == 1);
+	node_teste = priorityDequeue(priorityQueue);
+	CU_ASSERT(node_teste->element == 'c');
+	CU_ASSERT(node_teste->freq == 1);
+	//CU_ASSERT((((node*)priorityQueue->head)->next->item) == 'b'); ERRADO
 }
 
 int run_tests(){
@@ -69,4 +171,3 @@ int main(){
 
 	return CU_get_error();
 }
-
