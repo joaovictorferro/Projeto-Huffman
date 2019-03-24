@@ -1,5 +1,0 @@
-TREE = tree.h tree.c
-MAIN = main.c
-
-comprimir:
-	gcc	$(TREE)	$(MAIN)	-o	descompr -lm -w
