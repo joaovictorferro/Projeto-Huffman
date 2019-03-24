@@ -164,13 +164,15 @@ void main(){
 
   Graph * graph = createGraph(V);
 
-  addEdge(graph,0,1);
-  addEdge(graph,0,2);
-  addEdge(graph,0,3);
-  addEdge(graph,1,6);
-  addEdge(graph,2,5);
-  addEdge(graph,3,5);
-  addEdge(graph,5,6);
+  addEdge(graph,7,5);
+  addEdge(graph,7,6);
+  addEdge(graph,5,4);
+  addEdge(graph,6,4);
+  addEdge(graph,5,2);
+  addEdge(graph,6,3);
+  addEdge(graph,2,1);
+  addEdge(graph,3,1);
+  addEdge(graph,1,0);
 
   Stack * stack = createStack();
 
