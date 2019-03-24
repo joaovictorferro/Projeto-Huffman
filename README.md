@@ -8,7 +8,7 @@
 #### Apresentação: 
 - Dia: 25/03/2019
 #### Seminário:
-- Topolofical Sort
+- Topological Sort
 
 #### Contagem e Plotagem:
 - AVL VS ABB
