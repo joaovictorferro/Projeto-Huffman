@@ -181,6 +181,7 @@ while(loop)
       huffmanRoot = buildHuffmanTree(priorityQueue);
 
       free(priorityQueue);
+      free(frequencyArray);
 
       printTree(huffmanRoot);
       printf("\n");
