@@ -183,9 +183,6 @@ while(loop)
       free(priorityQueue);
       free(frequencyArray);
 
-      printTree(huffmanRoot);
-      printf("\n");
-
       int rootHeight = height(huffmanRoot);
 
       hash * hashTable = createHash(rootHeight+1);
@@ -193,12 +190,6 @@ while(loop)
       unsigned char auxiliarString[rootHeight+1];
 
       buildHash(hashTable,huffmanRoot,0,auxiliarString);
-
-      for(i=0;i<ASCII_SIZE;i++){
-        if(hashTable->items[i]->characterFrequency){
-          printf("%c %s\n", i, (unsigned char *)((helement*)hashTable->items[i])->binaryCode);
-        }
-      }
 
       StartCompress(hashTable, huffmanRoot, inputFile, name);
       eraseHash(hashTable);
